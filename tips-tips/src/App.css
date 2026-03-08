@@ -7,32 +7,8 @@
   background-color: rgb(193, 255, 174);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.pageTitle{
+  cursor: pointer;
 }
 
 .card {
@@ -45,6 +21,11 @@
 
 .tipsBoard{
   position: relative;
+  display: none;
+}
+
+.tipsBoard.isDisplay{
+  display: block;
 }
 
 .tip {
@@ -124,4 +105,54 @@
   justify-content: center;
   color: rgba(0, 0, 0, 0.7);
   cursor: pointer;
+}
+
+.postArea{
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  max-width: 1280px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ff0000;
+  display: none;
+}
+
+.postArea.isPop{
+  display: block;
+}
+.postTip{
+  margin: auto;
+  position: relative;
+}
+
+.postButton{
+  position: relative;
+}
+
+.postTipInput {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+.postTipInput:focus {
+  outline: none;
+}
+
+.postTipInputTitle {
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.postTipInputExplanation {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #2c2c2c;
 }

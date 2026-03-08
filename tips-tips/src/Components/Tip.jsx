@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Tip = ({tipTitle, tipExplanation, tipLikes, tipDetails, top, left}) => {
+const Tip = ({tipTitle, tipExplanation, tipLikes, tipDetails, top, left, rotate}) => {
     const [tipLike, setTipLike] = useState(tipLikes);
     const [isClicked, setIsClicked] = useState(false);
     const changeLikes = () => {
@@ -13,7 +13,7 @@ const Tip = ({tipTitle, tipExplanation, tipLikes, tipDetails, top, left}) => {
     }
 
     return(
-        <div className="tip card" style={{top:`${top}px`, left:`${left}px`}}>
+        <div className="tip" style={{top:`${top}px`, left:`${left}px`, transform: `rotate(${rotate}deg)`}}>
             <a href={tipDetails} className="tipDetails" aria-label="詳細を見る" />
             <h2 className="tipTitle">{tipTitle}</h2>
             <p className="tipText">{tipExplanation}</p>
