@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import TipsBoard from './Components/TipsBoard'
 import PostTip from './Components/PostTip';
@@ -8,6 +8,45 @@ function App() {
   const [confirmedWord, setConfirmedWord] = useState("");
   const [isDisplay, setIsDisplay] = useState(false);
   const [isPop, setIsPop] = useState(false);
+  const [tips, setTips] = useState([]);
+
+
+  useEffect(() => {
+    const fetchTips = async () => {
+      //評価値更新用処理
+      const updates = {};
+      tips.forEach(tip => {
+        updates[tip.id] = tip.tipLikes;
+      });
+
+      await fetch("http://localhost:8000/tips/batch-likes", {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates }),
+      });
+
+      //検索用処理
+      const url = new URL("http://localhost:8000/tips");
+      if (confirmedWord) {
+        url.searchParams.append("tag", confirmedWord);
+      }
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        setTips(data);
+      } catch (error) {
+        console.error("Failed to fetch tips:", error);
+      }
+    };
+
+    // 入力中のリクエスト過多を防ぐ
+    const timer = setTimeout(() => {
+      fetchTips();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [confirmedWord]); //入力が確定されるたびに実行
 
   const onInputKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -16,9 +55,13 @@ function App() {
     }
   };
 
+  //ページをリセット，すべてのstateは初期値に
+  //リセットでもconfirmedWordの更新判定になるので何とかしたい
+  //不要なリクエストが発生してる
   const resetPage = () => {
     setInputWord("");
     setConfirmedWord("");
+    setTips([]);
     setIsDisplay(false);
   };
 
@@ -39,7 +82,7 @@ function App() {
       <h2>確定:{confirmedWord}</h2>
       <button onClick={()=>setIsPop(true)}>編集を開く</button>
       <PostTip isPop={isPop} setIsPop={setIsPop}></PostTip>
-      <TipsBoard isDisplay={isDisplay}></TipsBoard>
+      <TipsBoard isDisplay={isDisplay} tips={tips} setTips={setTips}></TipsBoard>
     </>
   )
 }

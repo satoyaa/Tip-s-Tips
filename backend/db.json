@@ -1,0 +1,411 @@
+[
+  {
+    "id": "0",
+    "tipTitle": "0バナナの焼き方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "キャベツ",
+      "なす"
+    ],
+    "subTags": [
+      "焼き方",
+      "揚げ方",
+      "切り方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 482,
+    "tipDislikes": 12,
+    "upLoadDate": "2022/11/15"
+  },
+  {
+    "id": "5",
+    "tipTitle": "5バナナの味付け",
+    "tipExplanation": "バナナはチョコレートとの相性がとても良いです．バナナはチョコレートとの相性がとても良いです",
+    "mainTags": [
+      "バナナ",
+      "カップ麺",
+      "ぎょうざ"
+    ],
+    "subTags": [
+      "味付け"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 954,
+    "tipDislikes": 31,
+    "upLoadDate": "2024/01/05"
+  },
+  {
+    "id": "10",
+    "tipTitle": "10なすの切り方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "なす",
+      "バナナ"
+    ],
+    "subTags": [
+      "切り方",
+      "焼き方",
+      "味付け"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 520,
+    "tipDislikes": 22,
+    "upLoadDate": "2023/11/03"
+  },
+  {
+    "id": "12",
+    "tipTitle": "12バナナの焼き方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "かつ丼"
+    ],
+    "subTags": [
+      "焼き方",
+      "揚げ方",
+      "ゆで方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 912,
+    "tipDislikes": 45,
+    "upLoadDate": "2022/12/01"
+  },
+  {
+    "id": "21",
+    "tipTitle": "21ステーキの焼き方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "ステーキ",
+      "バナナ"
+    ],
+    "subTags": [
+      "焼き方",
+      "味付け",
+      "煮詰め方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 999,
+    "tipDislikes": 110,
+    "upLoadDate": "2024/03/05"
+  },
+  {
+    "id": "24",
+    "tipTitle": "24バナナの切り方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "お好み焼き"
+    ],
+    "subTags": [
+      "切り方",
+      "味付け"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 51,
+    "tipDislikes": 2,
+    "upLoadDate": "2022/11/08"
+  },
+  {
+    "id": "31",
+    "tipTitle": "31魚の味付け",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "魚",
+      "バナナ"
+    ],
+    "subTags": [
+      "味付け",
+      "ゆで方",
+      "揚げ方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 921,
+    "tipDislikes": 140,
+    "upLoadDate": "2023/03/18"
+  },
+  {
+    "id": "36",
+    "tipTitle": "36バナナの揚げ方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "ぎょうざ"
+    ],
+    "subTags": [
+      "揚げ方",
+      "ゆで方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 245,
+    "tipDislikes": 15,
+    "upLoadDate": "2022/10/28"
+  },
+  {
+    "id": "41",
+    "tipTitle": "41カップ麺の揚げ方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "カップ麺",
+      "バナナ"
+    ],
+    "subTags": [
+      "揚げ方",
+      "煮詰め方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 56,
+    "tipDislikes": 4,
+    "upLoadDate": "2023/06/05"
+  },
+  {
+    "id": "48",
+    "tipTitle": "48バナナの味付け",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "ステーキ"
+    ],
+    "subTags": [
+      "味付け",
+      "ゆで方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 74,
+    "tipDislikes": 2,
+    "upLoadDate": "2022/12/12"
+  },
+  {
+    "id": "51",
+    "tipTitle": "51天丼の揚げ方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "天丼",
+      "バナナ"
+    ],
+    "subTags": [
+      "揚げ方",
+      "ゆで方",
+      "煮詰め方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 843,
+    "tipDislikes": 91,
+    "upLoadDate": "2023/03/15"
+  },
+  {
+    "id": "59",
+    "tipTitle": "59キャベツの煮詰め方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "キャベツ",
+      "なす",
+      "バナナ"
+    ],
+    "subTags": [
+      "煮詰め方",
+      "焼き方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 89,
+    "tipDislikes": 4,
+    "upLoadDate": "2023/04/18"
+  },
+  {
+    "id": "60",
+    "tipTitle": "60バナナの揚げ方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "キャベツ"
+    ],
+    "subTags": [
+      "揚げ方",
+      "ゆで方",
+      "切り方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 754,
+    "tipDislikes": 62,
+    "upLoadDate": "2022/12/08"
+  },
+  {
+    "id": "61",
+    "tipTitle": "61焼き鳥の味付け",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "焼き鳥",
+      "バナナ"
+    ],
+    "subTags": [
+      "味付け",
+      "焼き方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 215,
+    "tipDislikes": 7,
+    "upLoadDate": "2023/10/25"
+  },
+  {
+    "id": "72",
+    "tipTitle": "72バナナの煮詰め方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "キャベツ",
+      "バナナ"
+    ],
+    "subTags": [
+      "煮詰め方",
+      "揚げ方",
+      "ゆで方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 531,
+    "tipDislikes": 42,
+    "upLoadDate": "2022/10/15"
+  },
+  {
+    "id": "73",
+    "tipTitle": "73焼き鳥の焼き方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "焼き鳥",
+      "バナナ"
+    ],
+    "subTags": [
+      "焼き方",
+      "切り方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 398,
+    "tipDislikes": 18,
+    "upLoadDate": "2023/12/10"
+  },
+  {
+    "id": "84",
+    "tipTitle": "84バナナの切り方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "キャベツ",
+      "バナナ"
+    ],
+    "subTags": [
+      "切り方",
+      "ゆで方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 49,
+    "tipDislikes": 2,
+    "upLoadDate": "2022/12/20"
+  },
+  {
+    "id": "85",
+    "tipTitle": "85焼き鳥の揚げ方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "焼き鳥",
+      "バナナ"
+    ],
+    "subTags": [
+      "揚げ方",
+      "焼き方",
+      "煮詰め方"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 756,
+    "tipDislikes": 82,
+    "upLoadDate": "2023/10/05"
+  },
+  {
+    "id": "96",
+    "tipTitle": "96バナナの焼き方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "バナナ",
+      "キャベツ",
+      "バナナ"
+    ],
+    "subTags": [
+      "焼き方",
+      "ゆで方"
+    ],
+    "source": [
+      "https://~~~~",
+      "https://~~~~",
+      "https://~~~~"
+    ],
+    "tipLikes": 945,
+    "tipDislikes": 105,
+    "upLoadDate": "2022/11/20"
+  },
+  {
+    "id": "97",
+    "tipTitle": "97焼き鳥の揚げ方",
+    "tipExplanation": "これはダミーテキストです．これはダミーテキストです．これはダミーテキストです．",
+    "mainTags": [
+      "焼き鳥",
+      "バナナ"
+    ],
+    "subTags": [
+      "揚げ方",
+      "切り方",
+      "味付け"
+    ],
+    "source": [
+      "https://~~~~"
+    ],
+    "tipLikes": 156,
+    "tipDislikes": 4,
+    "upLoadDate": "2023/12/15"
+  }
+]

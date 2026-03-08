@@ -1,26 +1,15 @@
-import demoData from '../Data/DemoData'
 import Tip from './Tip'
 import { memo } from 'react';
 
 
-const TipsBoard = memo(({isDisplay}) => {
-
+const TipsBoard = memo(({isDisplay, tips, setTips}) => {
     return (
         <div className={`tipsBoard ${isDisplay ? "isDisplay" : ""}`}>
-            {demoData.map((data, index) => {
-                const left = (index * 400) % 1200;
-                const top = Math.floor(index / 3) * 300;
-                const rotate = (Math.random()-0.5)*10;
-
+            {tips.map((data) => {
                 return (
-                <Tip key={data.id}
-                 tipTitle={data.tipTitle} 
-                 tipExplanation={data.tipExplanation}
-                 tipLikes={data.tipLikes} 
-                 tipDetails={data.source[0]}
-                 top={top}
-                 left={left}
-                 rotate={rotate}
+                <Tip key={data.id} 
+                data={data}
+                setTips={setTips}
                  >
                 </Tip>
                 );
