@@ -7,3 +7,7 @@ tips view
 add tip
 
 review tips
+
+## PreView
+
+https://satoyaa.github.io/Tip-s-Tips/
