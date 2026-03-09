@@ -1,0 +1,131 @@
+{
+  "keyword": "カレー",
+  "fetchedAt": "2026-03-09T15:13:53.466502+00:00",
+  "categories": [
+    {
+      "categoryId": "23-404",
+      "categoryName": "カレー鍋",
+      "type": "medium"
+    },
+    {
+      "categoryId": "30-307",
+      "categoryName": "カレー",
+      "type": "medium"
+    },
+    {
+      "categoryId": "127-1311",
+      "categoryName": "カレーピラフ",
+      "type": "small"
+    },
+    {
+      "categoryId": "152-913",
+      "categoryName": "カレーうどん",
+      "type": "small"
+    },
+    {
+      "categoryId": "197-2055",
+      "categoryName": "お弁当 カレー",
+      "type": "small"
+    }
+  ],
+  "totalRecipes": 4,
+  "recipes": [
+    {
+      "recipeId": 1950017940,
+      "recipeTitle": "♡残ったカレーリメイク♪簡単焼きカレードリア♡",
+      "recipeDescription": "カレーは沢山作りますよね( ´ ▽ ` )ﾉ\n美味しいけど何日も続くと飽きてしまいます(ﾟOﾟ)＼(- -;\n簡単にリメイクしてバリエーションを増やしましょう♡",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/1361d1e330e65b41ff0203c85dba48d3e4e68ae2.15.2.3.2.jpg",
+      "recipeMaterial": [
+        "カレー",
+        "ご飯",
+        "卵",
+        "とろけるチーズ",
+        "パン粉"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1950017940/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2020/07/01 17:03:47",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "100円以下",
+      "recipeIndication": "約15分",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    },
+    {
+      "recipeId": 1080009668,
+      "recipeTitle": "我が家の王道カレーライス♪寝かせなくても美味しい♪",
+      "recipeDescription": "うちの定番カレーライスです♪いろんなソースを隠し味に入れることで、味が複雑になり、一晩寝かせなくても、すぐに美味しいカレーが出来上がりますo(^▽^)o",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/fa3117b7037beaf99e2576983ddfce2fc6772063.94.2.3.2.jpg",
+      "recipeMaterial": [
+        "薄切り肉(牛、豚どちらでもOK)",
+        "玉ねぎ",
+        "にんじん",
+        "じゃがいも",
+        "サラダ油(野菜を炒める時)",
+        "市販カレールー",
+        "水",
+        "塩コショウ",
+        "ローリエ",
+        "A",
+        "ケチャップ",
+        "A",
+        "ウスターソース",
+        "A",
+        "トンカツソース",
+        "A.すりおろしにんにく",
+        "ご飯"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1080009668/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2014/11/04 21:00:16",
+      "shop": 0,
+      "pickup": 1,
+      "recipeCost": "1,000円前後",
+      "recipeIndication": "約1時間",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    },
+    {
+      "recipeId": 1150015784,
+      "recipeTitle": "簡単過ぎて美味しい☆残ったカレーでスープカレー",
+      "recipeDescription": "本当に簡単で美味しい!!お鍋に残ったカレーに水と調味料を足して煮込むだけで美味しいスープカレーができます♪",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/e33be7a30adad449b7c1de8e54f784091fb45617.81.9.3.3.jpg",
+      "recipeMaterial": [
+        "お鍋に残ったカレー",
+        "水",
+        "固形コンソメ",
+        "（※コンソメなければ鶏がらスープ粉末）"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1150015784/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2020/01/19 09:15:09",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "300円前後",
+      "recipeIndication": "約30分",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    },
+    {
+      "recipeId": 1750056664,
+      "recipeTitle": "普通の鍋で作る！ほろほろチキンカレー！",
+      "recipeDescription": "甘口を使用しているのでお子様にも◎\n具が細かいので翌日ドリアなどに\nアレンジしやすいです♩",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/f64aa221d899b369628d7a08d3f45c77eafa48e2.06.2.3.2.jpg",
+      "recipeMaterial": [
+        "鶏もも肉",
+        "玉ねぎ",
+        "人参",
+        "にんにく",
+        "ローリエ",
+        "カレー粉",
+        "カレールー"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1750056664/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2018/08/25 00:44:32",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "500円前後",
+      "recipeIndication": "1時間以上",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    }
+  ]
+}
