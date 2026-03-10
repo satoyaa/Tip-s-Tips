@@ -1,0 +1,393 @@
+{
+  "keyword": "カレー",
+  "fetchedAt": "2026-03-10T07:47:34.739404+00:00",
+  "categories": [
+    {
+      "categoryId": "23-404",
+      "categoryName": "カレー鍋",
+      "type": "medium"
+    },
+    {
+      "categoryId": "30-307",
+      "categoryName": "カレー",
+      "type": "medium"
+    },
+    {
+      "categoryId": "127-1311",
+      "categoryName": "カレーピラフ",
+      "type": "small"
+    },
+    {
+      "categoryId": "152-913",
+      "categoryName": "カレーうどん",
+      "type": "small"
+    },
+    {
+      "categoryId": "197-2055",
+      "categoryName": "お弁当 カレー",
+      "type": "small"
+    }
+  ],
+  "totalRecipes": 8,
+  "recipes": [
+    {
+      "recipeId": 1680001226,
+      "recipeTitle": "箸がとまらない！！！手作り和風カレー鍋！",
+      "recipeDescription": "野菜は何を入れてもOK！深みのあるとっても美味しいカレー鍋の完成！市販のより、うまうまです！！(^○^)",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/c45e3e51e14c39abaa3bf74b9e149c2834fdab19.00.2.3.2.jpg",
+      "recipeMaterial": [
+        "A)出汁",
+        "A)みりん、薄口醤油",
+        "A)醤油",
+        "B)カレー粉",
+        "B)片栗粉",
+        "B)水",
+        "鶏もも肉",
+        "豚肉",
+        "キャベツ",
+        "白菜",
+        "大根",
+        "人参",
+        "えのき",
+        "ぶなぴー（しめじ）",
+        "豆腐",
+        "白ねぎ"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1680001226/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2011/03/02 21:08:06",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "500円前後",
+      "recipeIndication": "約30分",
+      "categoryName": "カレー鍋",
+      "categoryId": "23-404"
+    },
+    {
+      "recipeId": 1690000913,
+      "recipeTitle": "残ったカレーで★洋風カレー鍋",
+      "recipeDescription": "いつもはキャベツを食べたがらない３歳の息子。大好きなカレーの味でやわらかく煮えたこのキャベツは沢山食べてくれました。",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/dddc8745cb6bf745b8ad08d2dd3214f81e1ff7cf.03.2.3.2.jpg",
+      "recipeMaterial": [
+        "水",
+        "にんじん",
+        "キャベツ",
+        "ブロッコリー",
+        "しめじ",
+        "ウインナー",
+        "*残ったカレー（具入り）",
+        "*水",
+        "コンソメ顆粒",
+        "粉チーズ"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1690000913/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2011/03/08 20:17:16",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "指定なし",
+      "recipeIndication": "指定なし",
+      "categoryName": "カレー鍋",
+      "categoryId": "23-404"
+    },
+    {
+      "recipeId": 1300000402,
+      "recipeTitle": "残り鍋をカレー鍋に変身させよう！！",
+      "recipeDescription": "残った鍋を次の日にカレー鍋にへんし～んっ ＼（0\\0）ゝ　残り物とは気付かれまい！(笑)",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/5125f6f3d2001c04d0399e6c4fceea522accd927.58.1.3.2.jpg",
+      "recipeMaterial": [
+        "前日の鍋の残り",
+        "出汁",
+        "タマネギ",
+        "人参",
+        "じゃがいも",
+        "ウインナーや豚肉",
+        "市販のカレールー"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1300000402/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2010/12/19 09:12:03",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "指定なし",
+      "recipeIndication": "指定なし",
+      "categoryName": "カレー鍋",
+      "categoryId": "23-404"
+    },
+    {
+      "recipeId": 1590002704,
+      "recipeTitle": "市販のルウで作るカレー鍋☆",
+      "recipeDescription": "具はお好きなものを入れてくださいね。\nオススメは油揚げや厚揚げ☆",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/640fb7665f57dd81f59ce56043ff74750e789bf9.87.2.3.2.jpg",
+      "recipeMaterial": [
+        "○水",
+        "○だしの素",
+        "○みりん",
+        "○しょう油",
+        "カレールウ",
+        "豚肉（バラや薄切り、こま肉）",
+        "白菜、キャベツ",
+        "じゃがいも",
+        "にんじんや玉ねぎ",
+        "長ネギ",
+        "えのきやしめじ等",
+        "油揚げや厚揚げ等",
+        "もやし",
+        "その他お好みの野菜"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1590002704/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2012/01/25 10:33:26",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "500円前後",
+      "recipeIndication": "約30分",
+      "categoryName": "カレー鍋",
+      "categoryId": "23-404"
+    },
+    {
+      "recipeId": 1950017940,
+      "recipeTitle": "♡残ったカレーリメイク♪簡単焼きカレードリア♡",
+      "recipeDescription": "カレーは沢山作りますよね( ´ ▽ ` )ﾉ\n美味しいけど何日も続くと飽きてしまいます(ﾟOﾟ)＼(- -;\n簡単にリメイクしてバリエーションを増やしましょう♡",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/1361d1e330e65b41ff0203c85dba48d3e4e68ae2.15.2.3.2.jpg",
+      "recipeMaterial": [
+        "カレー",
+        "ご飯",
+        "卵",
+        "とろけるチーズ",
+        "パン粉"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1950017940/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2020/07/01 17:03:47",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "100円以下",
+      "recipeIndication": "約15分",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    },
+    {
+      "recipeId": 1080009668,
+      "recipeTitle": "我が家の王道カレーライス♪寝かせなくても美味しい♪",
+      "recipeDescription": "うちの定番カレーライスです♪いろんなソースを隠し味に入れることで、味が複雑になり、一晩寝かせなくても、すぐに美味しいカレーが出来上がりますo(^▽^)o",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/fa3117b7037beaf99e2576983ddfce2fc6772063.94.2.3.2.jpg",
+      "recipeMaterial": [
+        "薄切り肉(牛、豚どちらでもOK)",
+        "玉ねぎ",
+        "にんじん",
+        "じゃがいも",
+        "サラダ油(野菜を炒める時)",
+        "市販カレールー",
+        "水",
+        "塩コショウ",
+        "ローリエ",
+        "A",
+        "ケチャップ",
+        "A",
+        "ウスターソース",
+        "A",
+        "トンカツソース",
+        "A.すりおろしにんにく",
+        "ご飯"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1080009668/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2014/11/04 21:00:16",
+      "shop": 0,
+      "pickup": 1,
+      "recipeCost": "1,000円前後",
+      "recipeIndication": "約1時間",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    },
+    {
+      "recipeId": 1360014805,
+      "recipeTitle": "ひき肉でつくる☆我が家の絶品カレー",
+      "recipeDescription": "我が家のカレーです。味に少しうるさい（笑）彼も美味しい美味しいと言って食べてくれます。",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/e4399c56f6d6cbeb5ace4ec798873bcd8b60ee01.25.2.3.2.jpg",
+      "recipeMaterial": [
+        "ひき肉(牛豚合挽き)",
+        "にんじん",
+        "玉ねぎ",
+        "じゃがいも",
+        "水",
+        "コンソメ",
+        "カレールー",
+        "ソース",
+        "醤油"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1360014805/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2018/03/08 15:03:33",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "指定なし",
+      "recipeIndication": "約1時間",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    },
+    {
+      "recipeId": 1750056664,
+      "recipeTitle": "普通の鍋で作る！ほろほろチキンカレー！",
+      "recipeDescription": "甘口を使用しているのでお子様にも◎\n具が細かいので翌日ドリアなどに\nアレンジしやすいです♩",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/f64aa221d899b369628d7a08d3f45c77eafa48e2.06.2.3.2.jpg",
+      "recipeMaterial": [
+        "鶏もも肉",
+        "玉ねぎ",
+        "人参",
+        "にんにく",
+        "ローリエ",
+        "カレー粉",
+        "カレールー"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1750056664/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2018/08/25 00:44:32",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "500円前後",
+      "recipeIndication": "1時間以上",
+      "categoryName": "カレー",
+      "categoryId": "30-307"
+    }
+  ],
+  "tips": [
+    {
+      "id": "1680001226",
+      "tipTitle": "絶品！手作り和風カレー鍋",
+      "tipExplanation": "出汁とカレー粉で作る、市販より深みのある手作り和風スープです。",
+      "mainTags": [
+        "鶏もも肉",
+        "豚肉",
+        "キャベツ"
+      ],
+      "subTags": [
+        "和風",
+        "鍋"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1680001226/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2011/03/02"
+    },
+    {
+      "id": "1690000913",
+      "tipTitle": "残りカレーで洋風カレー鍋",
+      "tipExplanation": "残ったカレーにコンソメを加え、子供も喜ぶ洋風鍋にリメイクします。",
+      "mainTags": [
+        "残ったカレー",
+        "ウインナー",
+        "キャベツ"
+      ],
+      "subTags": [
+        "リメイク",
+        "洋風"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1690000913/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2011/03/08"
+    },
+    {
+      "id": "1300000402",
+      "tipTitle": "前日の鍋をカレーにリメイク",
+      "tipExplanation": "前日の鍋の残りにルーを加えるだけで、飽きずに美味しく食べられます。",
+      "mainTags": [
+        "前日の鍋",
+        "豚肉",
+        "カレールー"
+      ],
+      "subTags": [
+        "節約",
+        "時短"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1300000402/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2010/12/19"
+    },
+    {
+      "id": "1590002704",
+      "tipTitle": "市販ルーで簡単カレー鍋",
+      "tipExplanation": "市販のルーと出汁を合わせるだけで、本格的なカレー鍋が楽しめます。",
+      "mainTags": [
+        "カレールー",
+        "豚肉",
+        "油揚げ"
+      ],
+      "subTags": [
+        "簡単",
+        "鍋"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1590002704/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2012/01/25"
+    },
+    {
+      "id": "1950017940",
+      "tipTitle": "残りカレーの焼きドリア",
+      "tipExplanation": "残ったカレーに卵とチーズをのせて焼くだけ。飽きずに楽しめる一品です。",
+      "mainTags": [
+        "カレー",
+        "卵",
+        "とろけるチーズ"
+      ],
+      "subTags": [
+        "オーブン料理",
+        "リメイク"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1950017940/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2020/07/01"
+    },
+    {
+      "id": "1080009668",
+      "tipTitle": "寝かせず旨い！王道カレー",
+      "tipExplanation": "隠し味にソース類を入れることで、一晩寝かせたような深みが出ます。",
+      "mainTags": [
+        "薄切り肉",
+        "玉ねぎ",
+        "カレールー"
+      ],
+      "subTags": [
+        "定番",
+        "隠し味"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1080009668/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2014/11/04"
+    },
+    {
+      "id": "1360014805",
+      "tipTitle": "ひき肉で作る絶品カレー",
+      "tipExplanation": "ひき肉を使うことで旨味が溶け出し、短時間でもコクのある仕上がりに。",
+      "mainTags": [
+        "ひき肉",
+        "玉ねぎ",
+        "じゃがいも"
+      ],
+      "subTags": [
+        "時短",
+        "煮込み"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1360014805/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2018/03/08"
+    },
+    {
+      "id": "1750056664",
+      "tipTitle": "ほろほろチキンカレー",
+      "tipExplanation": "鶏肉をじっくり煮込み、具材を細かくすることでアレンジも自在です。",
+      "mainTags": [
+        "鶏もも肉",
+        "玉ねぎ",
+        "カレールー"
+      ],
+      "subTags": [
+        "煮込み",
+        "子供向け"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1750056664/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2018/08/25"
+    }
+  ]
+}

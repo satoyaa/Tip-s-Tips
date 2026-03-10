@@ -1,0 +1,196 @@
+{
+  "keyword": "ハンバーグ",
+  "fetchedAt": "2026-03-10T07:42:41.273524+00:00",
+  "categories": [
+    {
+      "categoryId": "30-300",
+      "categoryName": "ハンバーグ",
+      "type": "medium"
+    },
+    {
+      "categoryId": "192-1557",
+      "categoryName": "ハンバーグソース",
+      "type": "small"
+    },
+    {
+      "categoryId": "197-2054",
+      "categoryName": "お弁当 ハンバーグ",
+      "type": "small"
+    },
+    {
+      "categoryId": "300-1130",
+      "categoryName": "ハンバーグステーキ",
+      "type": "small"
+    },
+    {
+      "categoryId": "300-1131",
+      "categoryName": "煮込みハンバーグ",
+      "type": "small"
+    }
+  ],
+  "totalRecipes": 4,
+  "recipes": [
+    {
+      "recipeId": 1570003792,
+      "recipeTitle": "簡単☆本格ハンバーグソース",
+      "recipeDescription": "ハンバーグを焼いた後のフライパンで作ります。",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/50fe37bda3c657b77f2842d28727ceb3e8d89f4e.31.2.3.2.jpg",
+      "recipeMaterial": [
+        "ケチャップ",
+        "ソース",
+        "バター",
+        "砂糖"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1570003792/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2011/07/23 21:50:12",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "指定なし",
+      "recipeIndication": "指定なし",
+      "categoryName": "ハンバーグ",
+      "categoryId": "30-300"
+    },
+    {
+      "recipeId": 1680007065,
+      "recipeTitle": "子どもも大好き★ふわふわ煮込みハンバーグ",
+      "recipeDescription": "ケチャップベースの甘辛ソースに、お豆腐を入れてフワフワなハンバーグです♪",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/700d95f00598e6bbe81a39c89496faceead16311.16.2.3.2.jpg",
+      "recipeMaterial": [
+        "牛豚合い挽き肉",
+        "玉ねぎ",
+        "☆絹豆腐",
+        "☆卵",
+        "☆パン粉",
+        "☆塩胡椒",
+        "☆塩",
+        "★ケチャップ",
+        "★ウスターソース",
+        "★酒",
+        "★みりん"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1680007065/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2017/11/04 22:55:37",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "300円前後",
+      "recipeIndication": "約30分",
+      "categoryName": "ハンバーグ",
+      "categoryId": "30-300"
+    },
+    {
+      "recipeId": 1070040366,
+      "recipeTitle": "離乳食後期～手づかみ食べに！豆腐ハンバーグ",
+      "recipeDescription": "我が家の定番離乳食。\n手づかみ食べしやすく、娘も喜んでモグモグ食べてくれます！\n豆腐の水切りなし！スプーンを使うので手も汚れず、簡単に作れます。",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/9ff982da59bfc1ea428d793f3412c5fc6da7f7c7.70.2.3.2.jpg",
+      "recipeMaterial": [
+        "鶏ひき肉",
+        "絹ごし豆腐",
+        "玉ねぎ",
+        "ニンジン",
+        "小松菜",
+        "片栗粉",
+        "醤油",
+        "オリーブオイル"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1070040366/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2016/06/19 23:23:09",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "300円前後",
+      "recipeIndication": "約15分",
+      "categoryName": "ハンバーグ",
+      "categoryId": "30-300"
+    },
+    {
+      "recipeId": 1570006548,
+      "recipeTitle": "簡単！旦那が絶賛するハンバーグソース♡",
+      "recipeDescription": "旦那は、このソースじゃないとガッカリします（笑）\nお気に入り登録8700名様になりました!!ありがとうございます( ;∀;)\nスタンプもレポも嬉しいです❤",
+      "foodImageUrl": "https://image.space.rakuten.co.jp/d/strg/ctrl/3/9cb3993b8370b7f8e8c512f10b6a9f47fa1af00a.88.2.3.2.jpg",
+      "recipeMaterial": [
+        "たまねぎ",
+        "焼肉のたれ",
+        "しょう油",
+        "砂糖",
+        "塩・こしょう"
+      ],
+      "recipeUrl": "https://recipe.rakuten.co.jp/recipe/1570006548/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2",
+      "recipePublishday": "2012/04/06 15:33:34",
+      "shop": 0,
+      "pickup": 0,
+      "recipeCost": "100円以下",
+      "recipeIndication": "5分以内",
+      "categoryName": "ハンバーグ",
+      "categoryId": "30-300"
+    }
+  ],
+  "tips": [
+    {
+      "id": "1570003792",
+      "tipTitle": "簡単☆本格ハンバーグソース",
+      "tipExplanation": "ハンバーグを焼いた後のフライパンで作ります。",
+      "mainTags": [
+        "ケチャップ",
+        "ソース",
+        "バター"
+      ],
+      "subTags": [
+        "ハンバーグ"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1570003792/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2011/07/23"
+    },
+    {
+      "id": "1680007065",
+      "tipTitle": "子どもも大好き★ふわふわ煮込みハンバーグ",
+      "tipExplanation": "ケチャップベースの甘辛ソースに、お豆腐を入れてフワフワなハンバーグです♪",
+      "mainTags": [
+        "牛豚合い挽き肉",
+        "玉ねぎ",
+        "☆絹豆腐"
+      ],
+      "subTags": [
+        "ハンバーグ"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1680007065/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2017/11/04"
+    },
+    {
+      "id": "1070040366",
+      "tipTitle": "離乳食後期～手づかみ食べに！豆腐ハンバーグ",
+      "tipExplanation": "我が家の定番離乳食。\n手づかみ食べしやすく、娘も喜んでモグモグ食べてくれます！\n豆腐の水切りなし！スプーンを使うので手も汚れず、簡単に作れます。",
+      "mainTags": [
+        "鶏ひき肉",
+        "絹ごし豆腐",
+        "玉ねぎ"
+      ],
+      "subTags": [
+        "ハンバーグ"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1070040366/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2016/06/19"
+    },
+    {
+      "id": "1570006548",
+      "tipTitle": "簡単！旦那が絶賛するハンバーグソース♡",
+      "tipExplanation": "旦那は、このソースじゃないとガッカリします（笑）\nお気に入り登録8700名様になりました!!ありがとうございます( ;∀;)\nスタンプもレポも嬉しいです❤",
+      "mainTags": [
+        "たまねぎ",
+        "焼肉のたれ",
+        "しょう油"
+      ],
+      "subTags": [
+        "ハンバーグ"
+      ],
+      "source": [
+        "https://recipe.rakuten.co.jp/recipe/1570006548/?rafcid=wsc_r_cr_17b11bec-30e8-4b1b-ae97-6b8303bebab2"
+      ],
+      "upLoadDate": "2012/04/06"
+    }
+  ]
+}

@@ -16,6 +16,8 @@ import os
 
 APP_ID = os.getenv("RAKUTEN_APP_ID")
 ACCESS_KEY = os.getenv("RAKUTEN_ACCESS_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_URL = os.getenv("GEMINI_API_URL")
 
 CATEGORY_LIST_URL = "https://openapi.rakuten.co.jp/recipems/api/Recipe/CategoryList/20170426"
 CATEGORY_RANKING_URL = "https://openapi.rakuten.co.jp/recipems/api/Recipe/CategoryRanking/20170426"
@@ -95,6 +97,101 @@ async def fetch_category_ranking(category_id: str) -> dict:
     return res.json()
 
 
+def fallback_transform(recipes: list[dict]) -> list[dict]:
+    """Gemini APIが使えない場合のフォールバック変換"""
+    tips = []
+    for i, recipe in enumerate(recipes):
+        publish = recipe.get("recipePublishday", "")
+        date_str = publish.split(" ")[0] if publish else ""
+        tips.append({
+            "id": str(recipe.get("recipeId", i)),
+            "tipTitle": recipe.get("recipeTitle", ""),
+            "tipExplanation": recipe.get("recipeDescription", ""),
+            "mainTags": recipe.get("recipeMaterial", [])[:3],
+            "subTags": [recipe.get("categoryName", "")],
+            "source": [recipe.get("recipeUrl", "")],
+            "upLoadDate": date_str,
+        })
+    return tips
+
+
+async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
+    """Gemini APIを使ってレシピデータをDemoData形式のTipsに要約"""
+    if not GEMINI_API_KEY:
+        print("GEMINI_API_KEY が未設定のため、フォールバック変換を使用します")
+        return fallback_transform(recipes)
+
+    recipes_for_prompt = [
+        {
+            "recipeTitle": r.get("recipeTitle", ""),
+            "recipeDescription": r.get("recipeDescription", ""),
+            "recipeMaterial": r.get("recipeMaterial", []),
+            "categoryName": r.get("categoryName", ""),
+        }
+        for r in recipes
+    ]
+
+    prompt = (
+        "以下の楽天レシピのデータを、料理Tipsカードとして表示するために加工してください。\n"
+        "各レシピについて以下のJSON形式で出力してください。\n"
+        "JSONの配列のみを出力してください。\n\n"
+        "出力形式:\n"
+        "[\n"
+        "  {\n"
+        '    "tipTitle": "短く魅力的なタイトル（15文字以内）",\n'
+        '    "tipExplanation": "簡潔でわかりやすい料理のコツや説明（40文字以内、文が途中で切れないようにすること）",\n'
+        '    "mainTags": ["メイン食材を材料から最大3つ"],\n'
+        '    "subTags": ["調理法や特徴を最大2つ"]\n'
+        "  }\n"
+        "]\n\n"
+        "レシピデータ:\n"
+        f"{json.dumps(recipes_for_prompt, ensure_ascii=False)}"
+    )
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.7,
+            "responseMimeType": "application/json",
+        },
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            res = await client.post(
+                GEMINI_API_URL,
+                params={"key": GEMINI_API_KEY},
+                json=payload,
+            )
+        if res.status_code != 200:
+            print(f"Gemini APIエラー: {res.status_code} {res.text}")
+            return fallback_transform(recipes)
+
+        data = res.json()
+        text = data["candidates"][0]["content"]["parts"][0]["text"]
+        summaries = json.loads(text)
+    except Exception as e:
+        print(f"Gemini API呼び出し失敗: {e}")
+        return fallback_transform(recipes)
+
+    # Geminiの要約と元レシピデータを合成してDemoData形式にする
+    tips = []
+    for i, recipe in enumerate(recipes):
+        summary = summaries[i] if i < len(summaries) else {}
+        publish = recipe.get("recipePublishday", "")
+        date_str = publish.split(" ")[0] if publish else ""
+        tips.append({
+            "id": str(recipe.get("recipeId", i)),
+            "tipTitle": summary.get("tipTitle", recipe.get("recipeTitle", "")),
+            "tipExplanation": summary.get("tipExplanation", recipe.get("recipeDescription", "")),
+            "mainTags": summary.get("mainTags", recipe.get("recipeMaterial", [])[:3]),
+            "subTags": summary.get("subTags", [recipe.get("categoryName", "")]),
+            "source": [recipe.get("recipeUrl", "")],
+            "upLoadDate": date_str,
+        })
+    return tips
+
+
 @app.post("/api/search")
 async def search_recipes(body: SearchRequest):
     keyword = body.keyword.strip()
@@ -147,16 +244,20 @@ async def search_recipes(body: SearchRequest):
         except Exception as e:
             print(f"カテゴリ {cat['categoryName']} のランキング取得エラー: {e}")
 
-    # 4. 結果を構築
+    # 4. Gemini APIでレシピを要約してDemoData形式に変換
+    tips = await summarize_with_gemini(all_recipes)
+
+    # 5. 結果を構築（元データも保持）
     result = {
         "keyword": keyword,
         "fetchedAt": datetime.now(timezone.utc).isoformat(),
         "categories": target_categories,
         "totalRecipes": len(all_recipes),
         "recipes": all_recipes,
+        "tips": tips,
     }
 
-    # 5. .json ファイルとして保存
+    # 6. .json ファイルとして保存
     timestamp = int(time.time() * 1000)
     safe_keyword = re.sub(r'[<>:"/\\|?*]', "_", keyword)
     file_name = f"{safe_keyword}_{timestamp}.json"

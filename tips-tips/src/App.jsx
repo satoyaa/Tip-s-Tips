@@ -28,9 +28,9 @@ function App() {
         const data = await res.json();
 
         if (res.ok) {
-          setRecipes(data.recipes || []);
+          setRecipes(data.tips || []);
           if (data.savedFile) {
-            setMessage(`${data.totalRecipes}件取得 → ${data.savedFile} に保存しました`);
+            setMessage(`${data.totalRecipes}件のレシピをAIで要約 → ${data.savedFile} に保存しました`);
           } else if (data.message) {
             setMessage(data.message);
           }
@@ -67,7 +67,7 @@ function App() {
        onKeyDown={onInputKeyDown}
        placeholder='食材・料理名を入力してEnter'
       />
-      {isLoading && <p>楽天レシピから検索中...</p>}
+      {isLoading && <p>楽天レシピから検索中...（AIで要約しています）</p>}
       {message && <p className="searchMessage">{message}</p>}
       <h2>確定:{confirmedWord}</h2>
       <button onClick={()=>setIsPop(true)}>編集を開く</button>
