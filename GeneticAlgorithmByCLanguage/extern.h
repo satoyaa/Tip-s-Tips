@@ -3,8 +3,11 @@
 
 #define MAX_ITERATION 1000
 #define POPULATION 100
-#define MAX_TIPS 100
 #define M_PI 3.14159265358979323846
+#define LOOPS 30
+#define MAX_TIPS 100
+//#define MUTATION_RATE 0.1
+//#define CROSSOVER_RATE 0.7
 
 typedef struct {
     double x;
@@ -19,11 +22,11 @@ typedef struct {
 } DataItem;
 
 typedef struct {
-    int Tag1;
-    int Tag2;
-    int Tag3;
-    int Tag4;
-    int Tag5;
+    double Tag1;
+    double Tag2;
+    double Tag3;
+    double Tag4;
+    double Tag5;
 } Tags;
 
 extern void initialize();
@@ -34,6 +37,9 @@ extern void mutation();
 extern void save(const char *filename);
 
 
+extern int max_tips;
+extern int num_tags;
+extern char Taglist[100][64];
 extern double fitness[POPULATION];
 extern TIPS genes[POPULATION][MAX_TIPS]; 
 extern DataItem dataset[50];
@@ -42,5 +48,7 @@ extern int best_index;
 extern int maxWidth;
 extern int tipWidth;
 extern int tipHeight;
+extern double crossover_rate;
+extern double mutation_rate;
 
 #endif

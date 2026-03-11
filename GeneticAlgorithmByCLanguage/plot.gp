@@ -7,8 +7,10 @@ set xrange [0:1280]
 set yrange [0:2000]
 set style fill solid 0.7 border lt -1
 set key off
+set size ratio -1
 
-# 描画実行
-# using 1:2:3 -> x:y:color
-# lc rgb variable -> 3列目の値をRGB色として使用
-plot "data.dat" using 1:2:3 with polygons lc rgb variable
+# 3. 描画実行
+# index 0: ポリゴンを描画 (using 1:2:3 -> x:y:color)
+# index 1: ラベルを描画 (using 1:2:3 -> x:y:"label_text")
+plot "data.dat" index 0 using 1:2:3 with polygons lc rgb variable, \
+     "data.dat" index 1 using 1:2:3 with labels font "Arial,14" textcolor rgb "black"

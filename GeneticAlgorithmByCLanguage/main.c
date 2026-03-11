@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "extern.h"
 
@@ -11,18 +12,24 @@ double fitness[POPULATION];
 double best;
 int best_index = 0;
 int maxWidth = 1280;
-int tipWidth = 220;
-int tipHeight = 180;
+int tipWidth = 247;
+int tipHeight = 176;
+double crossover_rate = 0.1;
+double mutation_rate = 0.5;
+int max_tips;
 
+char Taglist[100][10] = {"Tag0", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5}"};
+int num_tags = 4; // タグの数を設定（Tag1～Tag5）
 
 
 void ga(){
+    best = INFINITY; // 最良個体の適応度を初期化
     initialize();
     calc_fitness();
     for(int i=0;i < MAX_ITERATION;i++){
         selection();          // トーナメント選択
-        crossover();          // PMX交叉
-        mutation();           // 反転交叉
+        crossover();          // 1点交叉
+        mutation();           // 交換突然変異
         calc_fitness();// 適応度計算
     }
     // 現世代の最良個体を算出
@@ -31,60 +38,78 @@ void ga(){
             best = fitness[j];
         }
     }
-    //printf("best:%f\n",best);
 }
 
 int main(){
 
-    
+    max_tips = 25; // データの数を設定
 
-    // 2. データの初期化（テスト用ダミーデータ 50件）
-    for (int i = 0; i < 50; i++) {
+    // 2. テスト用ダミーデータ max_tips件
+    for (int i = 0; i < max_tips; i++) {
         dataset[i].x = 0.0;
         dataset[i].y = 0.0;
         dataset[i].rotate = (rand()%20-10);
+        char str1[10];
+        char str2[10];
+        char str3[10];
 
         // タグの生成例：
         // データごとに「1」「2」「3」の可変長を模擬
         if (i % 3 == 0) { // タグ1つの場合
-            strcpy(dataset[i].tags[0], "Tag1");
+            int r1 = rand() % num_tags + 1; // 1から5の乱数
+            sprintf(str1, "Tag%d", r1);
+            strcpy(dataset[i].tags[0], str1);
             strcpy(dataset[i].tags[1], "Tag0");
             strcpy(dataset[i].tags[2], "Tag0");
         } else if (i % 3 == 1) { // タグ2つの場合
-            strcpy(dataset[i].tags[0], "Tag2");
-            strcpy(dataset[i].tags[1], "Tag4");
-            strcpy(dataset[i].tags[2], "Tag0");
+            int r1 = rand() % num_tags + 1; // 1から5の乱数
+            sprintf(str1, "Tag%d", r1);
+            strcpy(dataset[i].tags[0], str1);
+            int r2 = rand() % num_tags + 1; // 1から5の乱数
+            if(r1==r2){
+                //同じタグが選ばれたTag0をセット
+                strcpy(dataset[i].tags[1], "Tag0");
+                strcpy(dataset[i].tags[2], "Tag0");
+            }else{
+                sprintf(str2, "Tag%d", r2);
+                strcpy(dataset[i].tags[1], str2);
+                strcpy(dataset[i].tags[2], "Tag0");
+            }
         } else { // タグ3つの場合
-            strcpy(dataset[i].tags[0], "Tag1");
-            strcpy(dataset[i].tags[1], "Tag3");
-            strcpy(dataset[i].tags[2], "Tag5");
+            int r1 = rand() % num_tags + 1; // 1から5の乱数
+            sprintf(str1, "Tag%d", r1);
+            strcpy(dataset[i].tags[0], str1);
+            int r2 = rand() % num_tags + 1; // 1から5の乱数
+            if(r1==r2){
+                //同じタグが選ばれたTag0をセット
+                strcpy(dataset[i].tags[1], "Tag0");
+                strcpy(dataset[i].tags[2], "Tag0");
+            }else{
+                sprintf(str2, "Tag%d", r2);
+                strcpy(dataset[i].tags[1], str2);
+                int r3 = rand() % num_tags + 1; // 1から5の乱数
+                if(r1==r3 || r2==r3){
+                    //同じタグが選ばれたTag0をセット
+                    strcpy(dataset[i].tags[2], "Tag0");
+                }else{
+                    sprintf(str3, "Tag%d", r3);
+                    strcpy(dataset[i].tags[2], str3);
+                }
+            }
         }
     }
 
     printf("Before Processing (First 5):\n");
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < max_tips; i++) {
         printf("Item[%d]: Tags = {%s, %s, %s}\n", i, dataset[i].tags[0], dataset[i].tags[1], dataset[i].tags[2]);
     }
-    //initialize();のテスト
-    initialize();
-
-    /*
-    printf("After Initialization (First 5 Individuals):\n");
-    for (int i = 0; i < 5; i++) {
-        printf("Individual[%d]: ", i);
-        for (int j = 0; j < MAX_TIPS; j++) {
-            if (genes[i][j].x != -1 && genes[i][j].y != -1) {
-                printf("(x: %.2f, y: %.2f) ", genes[i][j].x, genes[i][j].y);
-            }
-        }
-        printf("\n");
-    }*/
-
-    // データ読み込みプログラムのテスト
-    // dataset[i].rotate は genes[best_index][i] の回転量 (°)
+    
+    ga();
     save("data.dat");
-    calc_fitness();
-
-    //ga();
+    /*
+    printf("Fitness of first 5 individuals after selection:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("Individual[%d]: Fitness = %f\n", i, fitness[i]);
+    }*/
     return 0;
 }

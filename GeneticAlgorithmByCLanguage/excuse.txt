@@ -1,0 +1,11 @@
+python用の出力(オプションO3)最高速，不安定（何が不安定化は知らん）
+gcc -O3 -shared -o libGA.dll ga.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c
+
+python用の出力(オプションO2)標準の最適化
+gcc -O2 -shared -o libGA.dll ga.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c
+
+GA構築用（GAテスト）
+gcc main.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c save.c
+
+GA構築用（パラメータ調整）
+gcc parameter.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c save.c

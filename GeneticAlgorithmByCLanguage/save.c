@@ -8,7 +8,7 @@
 
 // タグから色を計算 (16進RGB)
 // タグごとの色
-// "1": 赤, "2": 青, "3": 緑, "4": 黄, "5": 白
+// "1": 赤, "2": 青, "3": 緑, "4": 黄色, "5": 白
 // 複数タグの場合はRGBを平均化
 static unsigned int computeTagColor(const DataItem *item) {
     unsigned int r = 0, g = 0, b = 0;
@@ -54,9 +54,12 @@ void save(const char *filename) {
         return;
     }
 
+    fprintf(fp, "# === Index 0: ポリゴンのデータ ===\n");
+    fprintf(fp, "# x座標   y座標    色コード\n");
+
     int rectNo = 1;
-    for (int i = 0; i < MAX_TIPS; i++) {
-        //未定義は保存しない
+    for (int i = 0; i < max_tips; i++) {
+        // 未定義は保存しない
         if (genes[best_index][i].x == -1 && genes[best_index][i].y == -1) {
             break;
         }
@@ -109,17 +112,43 @@ void save(const char *filename) {
         unsigned int color = computeTagColor(&dataset[i]);
 
         // 書き出し
-        if (rectNo > 1) {
-            fprintf(fp, "# Rectangle %d\n", rectNo);
-        }
+        fprintf(fp, "# Rectangle %d\n", rectNo);
         fprintf(fp, "%7.3f  %7.3f  0x%06X\n", x1, y1, color);
         fprintf(fp, "%7.3f  %7.3f  0x%06X\n", x2, y2, color);
         fprintf(fp, "%7.3f  %7.3f  0x%06X\n", x3, y3, color);
         fprintf(fp, "%7.3f  %7.3f  0x%06X\n", x4, y4, color);
         fprintf(fp, "%7.3f  %7.3f  0x%06X\n", x1, y1, color);
-        fprintf(fp, "\n\n");
+        fprintf(fp, "\n");
 
         rectNo++;
+    }
+
+    // ラベルデータ（Index 1）
+    fprintf(fp, "\n");
+    fprintf(fp, "# === Index 1: ラベルのデータ ===\n");
+    fprintf(fp, "# 図形データとの間は「空行を2行以上」あけてください（これでインデックスが1に切り替わります）\n");
+    fprintf(fp, "# ラベルを表示したい中心座標(x, y)と、\"表示したい文字列\" を記述します。\n");
+    fprintf(fp, "# Tag0以外のタグを並べてラベルとする\n\n");
+    fprintf(fp, "# x座標   y座標    ラベル文字列\n");
+
+    for (int i = 0; i < max_tips; i++) {
+        if (genes[best_index][i].x == -1 && genes[best_index][i].y == -1) {
+            break;
+        }
+
+        double x_center = genes[best_index][i].x + tipWidth / 2.0;
+        double y_center = genes[best_index][i].y + tipHeight / 2.0;
+
+        char label[64] = "";
+        for (int j = 0; j < 3; j++) {
+            if (strcmp(dataset[i].tags[j], "Tag0") != 0) {
+                strcat(label, dataset[i].tags[j]);
+            }
+        }
+
+        if (label[0] != '\0') {
+            fprintf(fp, "%7.3f  %7.3f  \"%s\"\n", x_center, y_center, label);
+        }
     }
 
     fclose(fp);
