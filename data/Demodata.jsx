@@ -139,7 +139,7 @@ export const demoData = [
     mainTags: ["バナナ", "キャベツ"],
     subTags: ["揚げ方", "ゆで方", "切り方"],
     source: ["https://~~~~", "https://~~~~", "https://~~~~"],
-    tipLikes: 754,
+    tipLikes: 754,　
     tipDislikes: 62,
     upLoadDate: "2022/12/08"
   },

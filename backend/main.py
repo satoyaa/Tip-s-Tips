@@ -1,9 +1,7 @@
+import asyncio
 import json
-import re
-import time
-from datetime import datetime, timezone
+from contextlib import asynccontextmanager
 from pathlib import Path
-from urllib.parse import quote
 
 import httpx
 from dotenv import load_dotenv
@@ -13,6 +11,13 @@ from pydantic import BaseModel
 load_dotenv()
 
 import os
+
+from DB import save_tips_to_db, search_tips_by_keyword, get_all_tags
+from DB.collector import (
+    collect_all_recipes,
+    collect_recipes_for_keyword,
+    periodic_collection,
+)
 
 APP_ID = os.getenv("RAKUTEN_APP_ID")
 ACCESS_KEY = os.getenv("RAKUTEN_ACCESS_KEY")
@@ -25,7 +30,27 @@ CATEGORY_RANKING_URL = "https://openapi.rakuten.co.jp/recipems/api/Recipe/Catego
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
-app = FastAPI()
+# データ収集の間隔（時間）
+COLLECT_INTERVAL_HOURS = int(os.getenv("COLLECT_INTERVAL_HOURS", "24"))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """サーバ起動時にバックグラウンドでデータ収集を開始"""
+    task = asyncio.create_task(
+        periodic_collection(
+            interval_hours=COLLECT_INTERVAL_HOURS,
+            fetch_category_list=fetch_category_list,
+            search_categories=search_categories,
+            fetch_category_ranking=fetch_category_ranking,
+            summarize_with_gemini=summarize_with_gemini,
+        )
+    )
+    yield
+    task.cancel()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 class SearchRequest(BaseModel):
@@ -133,15 +158,15 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
 
     prompt = (
         "以下の楽天レシピのデータを、料理Tipsカードとして表示するために加工してください。\n"
-        "各レシピについて以下のJSON形式で出力してください。\n"
-        "JSONの配列のみを出力してください。\n\n"
+        "料理の材料毎に、材料の調理のコツや方法について以下のJSON形式で出力してください。\n"
+        "JSONの配列のみを出力してください。\n"
         "出力形式:\n"
         "[\n"
         "  {\n"
-        '    "tipTitle": "短く魅力的なタイトル（15文字以内）",\n'
+        '    "tipTitle": "短く簡潔なタイトル（感嘆符などは不要）",\n'
         '    "tipExplanation": "簡潔でわかりやすい料理のコツや説明（40文字以内、文が途中で切れないようにすること）",\n'
-        '    "mainTags": ["メイン食材を材料から最大3つ"],\n'
-        '    "subTags": ["調理法や特徴を最大2つ"]\n'
+        '    "mainTags": ["料理の素材や種類に関する1つ"](例：「カレー」「バナナ」「鍋」等),\n'
+        '    "subTags": ["調理方法や工程を最大3つ"]\n'
         "  }\n"
         "]\n\n"
         "レシピデータ:\n"
@@ -192,84 +217,75 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
     return tips
 
 
+# ---------------------------------------------------------------------------
+# ユーザ向けAPI: DBからタグ検索のみ
+# ---------------------------------------------------------------------------
+
+
 @app.post("/api/search")
-async def search_recipes(body: SearchRequest):
+async def search_tips(body: SearchRequest):
+    """ユーザ検索 → DBのタグから取得。ヒットなしなら明示的に通知。"""
     keyword = body.keyword.strip()
     if not keyword:
         raise HTTPException(status_code=400, detail="キーワードを入力してください")
 
+    tips = search_tips_by_keyword(keyword)
+
+    if not tips:
+        return {
+            "keyword": keyword,
+            "tips": [],
+            "message": "ヒットがありません",
+        }
+
+    return {
+        "keyword": keyword,
+        "tips": tips,
+        "totalResults": len(tips),
+    }
+
+
+@app.get("/api/tags")
+async def get_tags():
+    """DBに登録されている全タグを返す"""
+    return get_all_tags()
+
+
+# ---------------------------------------------------------------------------
+# 管理者向けAPI: 手動でデータ収集をトリガー
+# ---------------------------------------------------------------------------
+
+
+@app.post("/api/collect")
+async def trigger_collection():
+    """全キーワードについてデータ収集を手動実行"""
     if not APP_ID or not ACCESS_KEY:
         raise HTTPException(
             status_code=500,
-            detail="RAKUTEN_APP_ID または RAKUTEN_ACCESS_KEY が設定されていません。.env ファイルを確認してください。",
+            detail="RAKUTEN_APP_ID または RAKUTEN_ACCESS_KEY が設定されていません。",
         )
-
-    # 1. カテゴリ一覧取得
-    category_data = await fetch_category_list()
-
-    # 2. キーワードでカテゴリ検索
-    matched_categories = search_categories(category_data, keyword)
-
-    if not matched_categories:
-        return {
-            "keyword": keyword,
-            "categories": [],
-            "recipes": [],
-            "message": "一致するカテゴリが見つかりませんでした",
-        }
-
-    # 3. 各カテゴリのランキングレシピを取得（最大5カテゴリ）
-    target_categories = matched_categories[:5]
-    all_recipes = []
-
-    for cat in target_categories:
-        try:
-            ranking_data = await fetch_category_ranking(cat["categoryId"])
-            for recipe in ranking_data.get("result", []):
-                all_recipes.append({
-                    "recipeId": recipe.get("recipeId"),
-                    "recipeTitle": recipe.get("recipeTitle"),
-                    "recipeDescription": recipe.get("recipeDescription"),
-                    "foodImageUrl": recipe.get("foodImageUrl"),
-                    "recipeMaterial": recipe.get("recipeMaterial"),
-                    "recipeUrl": recipe.get("recipeUrl"),
-                    "recipePublishday": recipe.get("recipePublishday"),
-                    "shop": recipe.get("shop"),
-                    "pickup": recipe.get("pickup"),
-                    "recipeCost": recipe.get("recipeCost"),
-                    "recipeIndication": recipe.get("recipeIndication"),
-                    "categoryName": cat["categoryName"],
-                    "categoryId": cat["categoryId"],
-                })
-        except Exception as e:
-            print(f"カテゴリ {cat['categoryName']} のランキング取得エラー: {e}")
-
-    # 4. Gemini APIでレシピを要約してDemoData形式に変換
-    tips = await summarize_with_gemini(all_recipes)
-
-    # 5. 結果を構築（元データも保持）
-    result = {
-        "keyword": keyword,
-        "fetchedAt": datetime.now(timezone.utc).isoformat(),
-        "categories": target_categories,
-        "totalRecipes": len(all_recipes),
-        "recipes": all_recipes,
-        "tips": tips,
-    }
-
-    # 6. .json ファイルとして保存
-    timestamp = int(time.time() * 1000)
-    safe_keyword = re.sub(r'[<>:"/\\|?*]', "_", keyword)
-    file_name = f"{safe_keyword}_{timestamp}.json"
-    file_path = DATA_DIR / file_name
-    file_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    print(f"保存完了: {file_path}")
-
-    return {**result, "savedFile": file_name}
+    total = await collect_all_recipes(
+        fetch_category_list,
+        search_categories,
+        fetch_category_ranking,
+        summarize_with_gemini,
+    )
+    return {"message": f"データ収集完了: {total}件保存"}
 
 
-@app.get("/api/files")
-async def list_files():
-    files = [f.name for f in DATA_DIR.glob("*.json")]
-    return {"files": files}
+@app.post("/api/collect/{keyword}")
+async def trigger_collection_keyword(keyword: str):
+    """特定キーワードでデータ収集を手動実行"""
+    if not APP_ID or not ACCESS_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="RAKUTEN_APP_ID または RAKUTEN_ACCESS_KEY が設定されていません。",
+        )
+    count = await collect_recipes_for_keyword(
+        keyword,
+        fetch_category_list,
+        search_categories,
+        fetch_category_ranking,
+        summarize_with_gemini,
+    )
+    return {"message": f"'{keyword}' のデータ収集完了: {count}件保存"}

@@ -29,13 +29,13 @@ function App() {
 
         if (res.ok) {
           setRecipes(data.tips || []);
-          if (data.savedFile) {
-            setMessage(`${data.totalRecipes}件のレシピをAIで要約 → ${data.savedFile} に保存しました`);
-          } else if (data.message) {
-            setMessage(data.message);
+          if (data.tips && data.tips.length > 0) {
+            setMessage(`${data.totalResults}件のTipsが見つかりました`);
+          } else {
+            setMessage(data.message || 'ヒットがありません');
           }
         } else {
-          setMessage(data.error || 'エラーが発生しました');
+          setMessage(data.detail || 'エラーが発生しました');
         }
       } catch (err) {
         setMessage('サーバーに接続できません。サーバーが起動しているか確認してください。');
@@ -67,7 +67,7 @@ function App() {
        onKeyDown={onInputKeyDown}
        placeholder='食材・料理名を入力してEnter'
       />
-      {isLoading && <p>楽天レシピから検索中...（AIで要約しています）</p>}
+      {isLoading && <p>検索中...</p>}
       {message && <p className="searchMessage">{message}</p>}
       <h2>確定:{confirmedWord}</h2>
       <button onClick={()=>setIsPop(true)}>編集を開く</button>
