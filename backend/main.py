@@ -7,6 +7,7 @@ import random
 import uuid
 import json
 import os
+import ctypes
 
 app = FastAPI()
 
@@ -44,8 +45,9 @@ class TipDisplay(BaseModel):
     id: str
     tipTitle: str
     tipExplanation: str
-    tipTop: int
-    tipLeft : int
+    subTags: List[str]
+    tipTop: float
+    tipLeft : float
     tipRotate : float
     source: List[str]
     tipLikes: int
@@ -59,6 +61,70 @@ class LikeUpdate(BaseModel):
 # バッチ更新用: { "updates": { "id1": likes1, "id2": likes2, ... } }
 class LikesBatchUpdate(BaseModel):
     updates: Dict[str, int]
+    
+#C言語に突っ込む用
+class DataPoint(ctypes.Structure):
+    _fields_ = [
+        ("x", ctypes.c_double),
+        ("y", ctypes.c_double),
+        ("tags", (ctypes.c_char * 64) * 3),  
+        ("rotate", ctypes.c_double)
+    ]
+    
+#タグリスト
+tag_list = ["焼き方", "ゆで方", "煮詰め方", "揚げ方", "切り方", "味付け"]
+
+#C言語ライブラリの読込
+lib = ctypes.CDLL('./libGA.dll')
+TagListType = (ctypes.c_char * 64) * 100
+lib.ga_main.argtypes = [
+    ctypes.POINTER(DataPoint), # DataItem* dataset
+    ctypes.c_int,             # int n
+]
+
+#C言語向け入力への変換用の関数
+def convert_tips_to_c_array(display_tips):
+    # 必要な要素数を持つC配列の型を動的に定義
+    num_tips = len(display_tips)
+    DataPointArray = DataPoint * num_tips
+    
+    # 配列のインスタンスを作成
+    c_array = DataPointArray()
+
+    for i, tip in enumerate(display_tips):
+        # 評価計算に必要な座標と回転角だけを抽出してマッピング
+        # (tipLeft -> x, tipTop -> y)
+        c_array[i].x = tip.tipLeft
+        c_array[i].y = tip.tipTop
+        c_array[i].rotate = tip.tipRotate
+        
+        # タグの変換処理
+        for j, tag in enumerate(tip.subTags):
+            if j >= 3:
+                break  # C側の配列サイズが3までのため、4つ以上のタグは除外
+            
+            # 日本語タグに対応するため UTF-8 のバイト列に変換して代入
+            c_array[i].tags[j].value = tag.encode('utf-8')
+            
+            
+    return c_array, num_tips
+
+#C言語の入力に適した形への変換
+def convert_tags_to_c_array(tag_list, max_byte_length=64):
+    num_tags = len(tag_list)
+    
+    # C言語の型「char[max_byte_length]」と「char[要素数][max_byte_length]」を動的に定義
+    TagStringType = ctypes.c_char * max_byte_length
+    TagListType = TagStringType * num_tags
+    
+    # ctypes の配列インスタンスを作成
+    c_tag_array = TagListType()
+    
+    for i, tag in enumerate(tag_list):
+        # バイト列に変換して代入 (.value を使うのが正しい書き方です)
+        c_tag_array[i].value = tag.encode('utf-8')
+        
+    return c_tag_array, num_tags
 
 def read_db() -> List[dict]:
     if not os.path.exists(DB_FILE):
@@ -85,8 +151,8 @@ def get_tips(tag: Optional[str] = Query(None)): # クエリパラメータ 'tag'
     # 2. 絞り込み後のリストに対して表示用計算を行う
     display_tips = []
     for index, item in enumerate(filtered_data):
-        tip_left = (index * 400) % 1200
-        tip_top = (index // 3) * 300
+        tip_left = 0
+        tip_top = 0
         tip_rotate = (random.random() - 0.5) * 10
         
         display_tips.append(TipDisplay(
@@ -96,13 +162,21 @@ def get_tips(tag: Optional[str] = Query(None)): # クエリパラメータ 'tag'
             tipTop=tip_top,
             tipLeft=tip_left,
             tipRotate=tip_rotate,
-            mainTags=item.get("mainTags", []),
+            subTags=item.get("subTags", []),
             source=item["source"],
             tipLikes=item["tipLikes"],
             tipDislikes=item["tipDislikes"],
             upLoadDate=item["upLoadDate"]
         ))
         
+    c_array, num_tips = convert_tips_to_c_array(display_tips)
+    c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
+    lib.ga_main(c_array, num_tips, c_tag_array, num_tags)
+    #for i in range(5):
+    #    print(f"Python-side: Updated Data[{i}] ({c_array[i].x}, {c_array[i].y})")
+    for i in range(num_tips):
+        display_tips[i].tipLeft = c_array[i].x
+        display_tips[i].tipTop = c_array[i].y
     return display_tips
 
 #ユーザ投稿の新しいデータの追加
