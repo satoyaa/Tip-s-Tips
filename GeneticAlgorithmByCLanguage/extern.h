@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     double x;
     double y;
-    char tags[3][10]; 
+    char tags[3][64]; 
     double rotate;
 } DataItem;
 

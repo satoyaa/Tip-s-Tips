@@ -52,7 +52,7 @@ def generate_test_data(n):
 # 4. データの準備
 n = 25
 data_array = generate_test_data(n)
-tag_list = ["Tag0", "キャベツ", "半バークステーキ", "Tag3", "Tag4", "バナナ"]
+tag_list = ["焼き方", "ゆで方", "煮詰め方", "揚げ方", "切り方", "味付け"]
 num_tags = len(tag_list)
 
 # 2. C言語の型「char[10]」と「char[要素数][10]」を定義

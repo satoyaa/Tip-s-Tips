@@ -20,6 +20,27 @@ int max_tips;
 int num_tags;
 char Taglist[100][64];
 
+void reset_ga_state() {
+    // 1. 配列のゼロクリア
+    // sizeof(配列名) とすることで、配列全体のサイズ分を確実に 0 で埋めます。
+    memset(genes, 0, sizeof(genes));
+    memset(dataset, 0, sizeof(dataset));
+    memset(fitness, 0, sizeof(fitness));
+    memset(Taglist, 0, sizeof(Taglist));
+
+    // 2. スカラー変数のリセット（ご提示の初期値に合わせる）
+    best_index = 0;
+    maxWidth = 1280;
+    tipWidth = 247;
+    tipHeight = 176;
+    crossover_rate = 0.1;
+    mutation_rate = 0.5;
+    
+    // 3. 初期値の指定がない変数のリセット
+    best = 0.0;       // ※GAの評価関数が負の値を取る場合は、適切な初期値（例えば -9999.0 等）に変更してください
+    max_tips = 0;
+    num_tags = 0;
+}
 
 void ga(){
     best = INFINITY; // 最良個体の適応度を初期化
@@ -41,6 +62,7 @@ void ga(){
 
 int ga_main(DataItem* dataset, int n, char tagList[100][64], int num_tags) {
     max_tips = n; // データの数を設定
+    reset_ga_state(); // GAの状態をリセット
     ga();
     //datasetの中身を最良個体に置き換える
     for (int j = 0; j < max_tips; j++) {
