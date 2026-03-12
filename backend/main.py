@@ -1,15 +1,45 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 from typing import Dict, List, Optional
 from datetime import datetime
+import asyncio
 import random
 import uuid
 import json
 import os
 import ctypes
 
-app = FastAPI()
+import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from collector import collect_all_recipes, collect_recipes_for_keyword, periodic_collection
+
+# データ収集の間隔（時間）
+COLLECT_INTERVAL_HOURS = int(os.getenv("COLLECT_INTERVAL_HOURS", "24"))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """サーバ起動時にバックグラウンドでデータ収集を開始"""
+    task = asyncio.create_task(
+        periodic_collection(
+            interval_hours=COLLECT_INTERVAL_HOURS,
+            fetch_category_list=fetch_category_list,
+            search_categories=search_categories,
+            fetch_category_ranking=fetch_category_ranking,
+            summarize_with_gemini=summarize_with_gemini,
+        )
+    )
+    yield
+    task.cancel()
+
+
+app = FastAPI(lifespan=lifespan)
 
 # CORS設定（Reactからのアクセス許可）
 app.add_middleware(
@@ -237,3 +267,164 @@ def update_tips_batch_likes(batch: LikesBatchUpdate):
     
     write_db(db)
     return {"updated": list(batch.updates.keys())}
+
+
+# ===================================================================
+# データ収集機能（楽天レシピAPI → Gemini → dbAll.json）
+# ===================================================================
+
+RAKUTEN_APP_ID = os.getenv("RAKUTEN_APP_ID")
+RAKUTEN_ACCESS_KEY = os.getenv("RAKUTEN_ACCESS_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_URL = os.getenv("GEMINI_API_URL")
+
+CATEGORY_LIST_URL = "https://openapi.rakuten.co.jp/recipems/api/Recipe/CategoryList/20170426"
+CATEGORY_RANKING_URL = "https://openapi.rakuten.co.jp/recipems/api/Recipe/CategoryRanking/20170426"
+
+
+async def fetch_category_list() -> dict:
+    """カテゴリ一覧を取得"""
+    params = {
+        "format": "json",
+        "applicationId": RAKUTEN_APP_ID,
+        "accessKey": RAKUTEN_ACCESS_KEY,
+    }
+    async with httpx.AsyncClient() as client:
+        res = await client.get(CATEGORY_LIST_URL, params=params)
+    if res.status_code != 200:
+        raise Exception(f"カテゴリ一覧の取得に失敗: {res.status_code}")
+    return res.json()
+
+
+def search_categories(category_data: dict, keyword: str) -> list[dict]:
+    """キーワードに一致するカテゴリを検索"""
+    matched = []
+    result = category_data.get("result", {})
+    for cat in result.get("large", []):
+        if keyword in cat["categoryName"]:
+            matched.append({"categoryId": str(cat["categoryId"]), "categoryName": cat["categoryName"]})
+    for cat in result.get("medium", []):
+        if keyword in cat["categoryName"]:
+            matched.append({"categoryId": f"{cat['parentCategoryId']}-{cat['categoryId']}", "categoryName": cat["categoryName"]})
+    for cat in result.get("small", []):
+        if keyword in cat["categoryName"]:
+            matched.append({"categoryId": f"{cat['parentCategoryId']}-{cat['categoryId']}", "categoryName": cat["categoryName"]})
+    return matched
+
+
+async def fetch_category_ranking(category_id: str) -> dict:
+    """カテゴリIDからランキングレシピを取得"""
+    params = {
+        "format": "json",
+        "applicationId": RAKUTEN_APP_ID,
+        "accessKey": RAKUTEN_ACCESS_KEY,
+        "categoryId": category_id,
+    }
+    async with httpx.AsyncClient() as client:
+        res = await client.get(CATEGORY_RANKING_URL, params=params)
+    if res.status_code != 200:
+        raise Exception(f"ランキング取得失敗: {res.status_code}")
+    return res.json()
+
+
+def fallback_transform(recipes: list[dict]) -> list[dict]:
+    """Gemini APIが使えない場合のフォールバック変換"""
+    tips = []
+    for i, recipe in enumerate(recipes):
+        publish = recipe.get("recipePublishday", "")
+        date_str = publish.split(" ")[0] if publish else ""
+        tips.append({
+            "tipTitle": recipe.get("recipeTitle", ""),
+            "tipExplanation": recipe.get("recipeDescription", ""),
+            "mainTags": recipe.get("recipeMaterial", [])[:3],
+            "subTags": [recipe.get("categoryName", "")],
+            "source": [recipe.get("recipeUrl", "")],
+            "upLoadDate": date_str,
+        })
+    return tips
+
+
+async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
+    """Gemini APIを使ってレシピデータをTips形式に要約"""
+    if not GEMINI_API_KEY:
+        print("GEMINI_API_KEY 未設定 → フォールバック変換を使用")
+        return fallback_transform(recipes)
+
+    recipes_for_prompt = [
+        {k: r.get(k, "") for k in ("recipeTitle", "recipeDescription", "recipeMaterial", "categoryName")}
+        for r in recipes
+    ]
+
+    prompt = (
+        "以下の楽天レシピのデータを、料理Tipsカードとして表示するために加工してください。\n"
+        "料理の材料毎に、材料の調理のコツや方法について以下のJSON形式で出力してください。\n"
+        "JSONの配列のみを出力してください。\n"
+        "出力形式:\n"
+        '[\n  {\n    "tipTitle": "短く簡潔なタイトル",\n'
+        '    "tipExplanation": "簡潔な料理のコツ（40文字以内）",\n'
+        '    "mainTags": ["素材や種類1つ"],\n'
+        '    "subTags": ["調理方法を最大3つ"]\n  }\n]\n\n'
+        "レシピデータ:\n"
+        f"{json.dumps(recipes_for_prompt, ensure_ascii=False)}"
+    )
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.7, "responseMimeType": "application/json"},
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            res = await client.post(GEMINI_API_URL, params={"key": GEMINI_API_KEY}, json=payload)
+        if res.status_code != 200:
+            print(f"Gemini APIエラー: {res.status_code} {res.text}")
+            return fallback_transform(recipes)
+        text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        summaries = json.loads(text)
+    except Exception as e:
+        print(f"Gemini API失敗: {e}")
+        return fallback_transform(recipes)
+
+    tips = []
+    for i, recipe in enumerate(recipes):
+        summary = summaries[i] if i < len(summaries) else {}
+        publish = recipe.get("recipePublishday", "")
+        date_str = publish.split(" ")[0] if publish else ""
+        tips.append({
+            "tipTitle": summary.get("tipTitle", recipe.get("recipeTitle", "")),
+            "tipExplanation": summary.get("tipExplanation", recipe.get("recipeDescription", "")),
+            "mainTags": summary.get("mainTags", recipe.get("recipeMaterial", [])[:3]),
+            "subTags": summary.get("subTags", [recipe.get("categoryName", "")]),
+            "source": [recipe.get("recipeUrl", "")],
+            "upLoadDate": date_str,
+        })
+    return tips
+
+
+# --- データ収集エンドポイント ---
+
+@app.post("/api/collect")
+async def trigger_collection():
+    print("[API] データ収集トリガー")
+    """全キーワードでデータ収集を手動実行"""
+    if not RAKUTEN_APP_ID or not RAKUTEN_ACCESS_KEY:
+        raise HTTPException(status_code=500, detail="楽天APIキーが未設定です")
+    total = await collect_all_recipes(
+        fetch_category_list, search_categories,
+        fetch_category_ranking, summarize_with_gemini,
+    )
+    return {"message": f"データ収集完了: {total}件保存"}
+
+
+@app.post("/api/collect/{keyword}")
+async def trigger_collection_keyword(keyword: str):
+    print(f"[API] データ収集トリガー: {keyword}")
+    """特定キーワードでデータ収集を手動実行"""
+    if not RAKUTEN_APP_ID or not RAKUTEN_ACCESS_KEY:
+        raise HTTPException(status_code=500, detail="楽天APIキーが未設定です")
+    count = await collect_recipes_for_keyword(
+        keyword,
+        fetch_category_list, search_categories,
+        fetch_category_ranking, summarize_with_gemini,
+    )
+    return {"message": f"'{keyword}' → {count}件保存"}
