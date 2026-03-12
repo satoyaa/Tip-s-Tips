@@ -12,7 +12,8 @@ load_dotenv()
 
 import os
 
-from DB import save_tips_to_db, search_tips_by_keyword, get_all_tags
+#from DB import save_tips_to_db, search_tips_by_keyword, get_all_tags
+from DB import save_tips_to_json, search_tips_by_keyword, get_all_tags
 from DB.collector import (
     collect_all_recipes,
     collect_recipes_for_keyword,

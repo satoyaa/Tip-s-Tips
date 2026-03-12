@@ -8,6 +8,7 @@
 import asyncio
 
 from .operations import save_tips_to_db
+from .operations import save_tips_to_json
 
 # 収集対象のキーワードリスト
 #COLLECT_KEYWORDS = [
@@ -61,7 +62,8 @@ async def collect_recipes_for_keyword(
 
         if all_recipes:
             tips = await summarize_with_gemini(all_recipes)
-            save_tips_to_db(tips)
+            #save_tips_to_db(tips)
+            save_tips_to_json(tips)  # ← 変更
             print(f"[データ収集] '{keyword}' → {len(tips)}件保存完了")
             return len(tips)
 
