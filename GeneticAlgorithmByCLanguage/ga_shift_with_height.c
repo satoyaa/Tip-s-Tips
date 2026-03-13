@@ -16,21 +16,23 @@ int tipWidth = 247;
 int tipHeight = 176;
 double crossover_rate = 0.1;
 double mutation_rate = 0.5;
+double mutation_shift_rate = 0.2;
 int max_tips;
 
-char Taglist[100][64] = {"Tag6", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"};
+char Taglist[100][64] = {"Tag0", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"};
 int num_tags = 6; // タグの数を設定（Tag1～Tag5）
 
 
 void ga(){
     best = INFINITY; // 最良個体の適応度を初期化
     initialize();
-    calc_fitness();
+    calc_fitness_with_height();
     for(int i=0;i < MAX_ITERATION;i++){
         selection();          // トーナメント選択
         crossover();          // 1点交叉
         mutation();           // 交換突然変異
-        calc_fitness();// 適応度計算
+        mutation_shift();     // TIPの位置をずらす突然変異
+        calc_fitness_with_height();// 適応度計算
     }
     // 現世代の最良個体を算出
     for (int j = 0; j < POPULATION; j++) {

@@ -4,11 +4,63 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: rgb(193, 255, 174);
 }
 
 .pageTitle{
   cursor: pointer;
+  color: #ffffff;
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 15vh;
+}
+
+.pageSubTitle{
+  color: #ffffff;
+  font-family: "Kiwi Maru", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 4vh;
+}
+
+.searchContainer {
+  padding: 20px;
+  background-color: #f5f5f5; /* 背景色（見やすくするため） */
+}
+
+.customInput {
+  width: 80%;
+  max-width: 800px;
+  padding: 13px 25px;
+  font-size: 18px;
+  border-radius: 50px;
+
+  border: 1px solid #dcdcdc;
+  background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+  
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  
+  color: #333;
+  outline: none; 
+  transition: all 0.3s ease;
+}
+
+.customInput::placeholder {
+  color: #999;
+}
+
+.custom-input:focus {
+  border-color: #ccc;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.postOpenButton{
+  padding: 0;
+  background-color: transparent;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
 }
 
 .card {
@@ -22,6 +74,8 @@
 .tipsBoard{
   position: relative;
   display: none;
+  background-color: rgb(255, 207, 117);
+  height: 150vh;
 }
 
 .tipsBoard.isDisplay{

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { SquarePen } from "lucide-react";
+
 import './App.css'
 import TipsBoard from './Components/TipsBoard'
 import PostTip from './Components/PostTip';
@@ -71,16 +73,23 @@ function App() {
       onClick={resetPage}
       className='pageTitle'
       >Tip's Tips</h1>
-      <h2>暮らしに小さな幸せを</h2>
+      <h2 className='pageSubTitle'>～暮らしに小さな幸せを～</h2>
       <input
        type="text" 
        value={inputWord}
        onChange={ (e) => setInputWord(e.target.value)}
        onKeyDown={onInputKeyDown}
-       placeholder='文字を入力'
+       placeholder='幸せを探す'
+       className='customInput'
       />
-      <h2>確定:{confirmedWord}</h2>
-      <button onClick={()=>setIsPop(true)}>編集を開く</button>
+      <button className='postOpenButton' onClick={()=>setIsPop(true)}>
+        <SquarePen
+        size={50}        // サイズ
+        color="#ffffff"    // 色
+        strokeWidth={2}  // 線の太さ
+        />
+      </button>
+      
       <PostTip isPop={isPop} setIsPop={setIsPop}></PostTip>
       <TipsBoard isDisplay={isDisplay} tips={tips} setTips={setTips}></TipsBoard>
     </>

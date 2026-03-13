@@ -1,5 +1,6 @@
 import { useState, memo } from "react";
 
+
 const PostTip = memo(({isPop, setIsPop}) => {
     const [inputTitle, setInputTitle] = useState("");
     const [inputExplanation, setExplanation] = useState("");

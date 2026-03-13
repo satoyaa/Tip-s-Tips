@@ -75,12 +75,16 @@ class DataPoint(ctypes.Structure):
 tag_list = ["焼き方", "ゆで方", "煮詰め方", "揚げ方", "切り方", "味付け"]
 
 #C言語ライブラリの読込
-lib = ctypes.CDLL('./libGA.dll')
+lib = ctypes.CDLL('./libGA2.dll')
 TagListType = (ctypes.c_char * 64) * 100
+"""
 lib.ga_main.argtypes = [
     ctypes.POINTER(DataPoint), # DataItem* dataset
     ctypes.c_int,             # int n
+    TagListType,
+    ctypes.c_int,
 ]
+"""
 
 #C言語向け入力への変換用の関数
 def convert_tips_to_c_array(display_tips):

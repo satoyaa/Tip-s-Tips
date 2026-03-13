@@ -6,6 +6,7 @@
 #define M_PI 3.14159265358979323846
 #define LOOPS 30
 #define MAX_TIPS 100
+#define WEIGHT 50
 //#define MUTATION_RATE 0.1
 //#define CROSSOVER_RATE 0.7
 
@@ -32,8 +33,10 @@ typedef struct {
 extern void initialize();
 extern void selection();
 extern void calc_fitness();
+extern void calc_fitness_with_height();
 extern void crossover();
 extern void mutation();
+extern void mutation_shift();
 extern void save(const char *filename);
 
 
@@ -50,5 +53,6 @@ extern int tipWidth;
 extern int tipHeight;
 extern double crossover_rate;
 extern double mutation_rate;
+extern double mutation_shift_rate;
 
 #endif
