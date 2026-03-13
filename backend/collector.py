@@ -9,19 +9,6 @@ import asyncio
 
 from operations_JSON import save_tips_to_json
 
-# 収集対象のキーワードリスト
-#COLLECT_KEYWORDS = [
-#    "肉", "魚", "野菜", "パスタ", "サラダ",
-#    "スープ", "丼", "麺", "鍋", "揚げ物",
-#    "焼き鳥", "カレー", "パン", "卵", "豆腐",
-#]
-
-COLLECT_KEYWORDS = [
-   "肉", "魚", "野菜", "麺", "鍋", 
-   "焼き鳥", "カレー", "パン", "卵", 
-]
-
-
 
 async def collect_recipes_for_keyword(
     keyword: str,
@@ -73,6 +60,7 @@ async def collect_recipes_for_keyword(
 
 
 async def collect_all_recipes(
+    keywords,
     fetch_category_list,
     search_categories,
     fetch_category_ranking,
@@ -81,7 +69,7 @@ async def collect_all_recipes(
     """全キーワードについてデータ収集を実行"""
     print("[データ収集] 開始...")
     total = 0
-    for keyword in COLLECT_KEYWORDS:
+    for keyword in keywords:
         count = await collect_recipes_for_keyword(
             keyword,
             fetch_category_list,
@@ -97,6 +85,7 @@ async def collect_all_recipes(
 
 async def periodic_collection(
     interval_hours: int,
+    keywords,
     fetch_category_list,
     search_categories,
     fetch_category_ranking,
@@ -105,6 +94,7 @@ async def periodic_collection(
     """定期的にデータ収集を実行するバックグラウンドタスク"""
     while True:
         await collect_all_recipes(
+            keywords,
             fetch_category_list,
             search_categories,
             fetch_category_ranking,

@@ -22,21 +22,29 @@ from collector import collect_all_recipes, collect_recipes_for_keyword, periodic
 # データ収集の間隔（時間）
 COLLECT_INTERVAL_HOURS = int(os.getenv("COLLECT_INTERVAL_HOURS", "24"))
 
+# データ収集の実行フラグ（true: API使用, false: 既存dbAll.jsonのみ）
+COLLECT_EXE = os.getenv("COLLECT_EXE", "true").lower() == "true"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """サーバ起動時にバックグラウンドでデータ収集を開始"""
-    task = asyncio.create_task(
-        periodic_collection(
-            interval_hours=COLLECT_INTERVAL_HOURS,
-            fetch_category_list=fetch_category_list,
-            search_categories=search_categories,
-            fetch_category_ranking=fetch_category_ranking,
-            summarize_with_gemini=summarize_with_gemini,
+    if COLLECT_EXE:
+        task = asyncio.create_task(
+            periodic_collection(
+                interval_hours=COLLECT_INTERVAL_HOURS,
+                keywords=tag_list,
+                fetch_category_list=fetch_category_list,
+                search_categories=search_categories,
+                fetch_category_ranking=fetch_category_ranking,
+                summarize_with_gemini=summarize_with_gemini,
+            )
         )
-    )
-    yield
-    task.cancel()
+        yield
+        task.cancel()
+    else:
+        print("[起動] COLLECT_EXE=false: データ収集をスキップし、既存のdbAll.jsonを使用します")
+        yield
 
 
 app = FastAPI(lifespan=lifespan)
@@ -199,14 +207,13 @@ def get_tips(tag: Optional[str] = Query(None)): # クエリパラメータ 'tag'
             upLoadDate=item["upLoadDate"]
         ))
         
-    c_array, num_tips = convert_tips_to_c_array(display_tips)
-    c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
-    lib.ga_main(c_array, num_tips, c_tag_array, num_tags)
-    #for i in range(5):
-    #    print(f"Python-side: Updated Data[{i}] ({c_array[i].x}, {c_array[i].y})")
-    for i in range(num_tips):
-        display_tips[i].tipLeft = c_array[i].x
-        display_tips[i].tipTop = c_array[i].y
+    if num_tips := len(display_tips):
+        c_array, num_tips = convert_tips_to_c_array(display_tips)
+        c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
+        lib.ga_main(c_array, num_tips, c_tag_array, num_tags)
+        for i in range(num_tips):
+            display_tips[i].tipLeft = c_array[i].x
+            display_tips[i].tipTop = c_array[i].y
     return display_tips
 
 #ユーザ投稿の新しいデータの追加
@@ -407,9 +414,12 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
 async def trigger_collection():
     print("[API] データ収集トリガー")
     """全キーワードでデータ収集を手動実行"""
+    if not COLLECT_EXE:
+        raise HTTPException(status_code=400, detail="COLLECT_EXE=falseのため、データ収集は無効です")
     if not RAKUTEN_APP_ID or not RAKUTEN_ACCESS_KEY:
         raise HTTPException(status_code=500, detail="楽天APIキーが未設定です")
     total = await collect_all_recipes(
+        tag_list,
         fetch_category_list, search_categories,
         fetch_category_ranking, summarize_with_gemini,
     )
@@ -420,6 +430,8 @@ async def trigger_collection():
 async def trigger_collection_keyword(keyword: str):
     print(f"[API] データ収集トリガー: {keyword}")
     """特定キーワードでデータ収集を手動実行"""
+    if not COLLECT_EXE:
+        raise HTTPException(status_code=400, detail="COLLECT_EXE=falseのため、データ収集は無効です")
     if not RAKUTEN_APP_ID or not RAKUTEN_ACCESS_KEY:
         raise HTTPException(status_code=500, detail="楽天APIキーが未設定です")
     count = await collect_recipes_for_keyword(
