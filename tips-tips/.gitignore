@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 環境変数ファイルを除外
+.env
+.env.*
+!.env.example

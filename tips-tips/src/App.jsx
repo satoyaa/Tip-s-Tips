@@ -21,14 +21,16 @@ function App() {
         updates[tip.id] = tip.tipLikes;
       });
 
-      await fetch("http://localhost:8000/tips/batch-likes", {
+      //await fetch("http://localhost:8000/tips/batch-likes", {
+      await fetch(`${import.meta.env.VITE_API_URL}/tips/batch-likes`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ updates }),
       });
 
       //検索用処理
-      const url = new URL("http://localhost:8000/tips");
+      //const url = new URL("http://localhost:8000/tips");
+      const url = new URL(`${import.meta.env.VITE_API_URL}/tips`);
       if (confirmedWord) {
         url.searchParams.append("tag", confirmedWord);
       }
