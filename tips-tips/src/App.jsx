@@ -73,7 +73,7 @@ function App() {
       onClick={resetPage}
       className='pageTitle'
       >Tip's Tips</h1>
-      <h2 className='pageSubTitle'>～暮らしに小さな幸せを～</h2>
+      <h2 className='pageSubTitle'>～いつもの暮らしをちょっと豊かに～</h2>
       <input
        type="text" 
        value={inputWord}

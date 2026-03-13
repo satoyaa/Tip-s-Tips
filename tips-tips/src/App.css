@@ -72,6 +72,7 @@
 }
 
 .tipsBoard{
+  margin-top: 50px;
   position: relative;
   display: none;
   background-color: rgb(255, 207, 117);
@@ -91,7 +92,7 @@
   max-width: 230px;
   min-width: 120px;
   width: 200px;
-  height: 130;
+  height: 130px;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -165,17 +166,18 @@
 .postArea{
   position: fixed;
   z-index: 1;
-  width: 100%;
-  max-width: 1280px;
+  width: 100vw;
+  height: 100vh;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #ff0000;
+  background-color: #3333332c;
   display: none;
+  align-items: center;
 }
 
 .postArea.isPop{
-  display: block;
+  display: flex
 }
 .postTip{
   margin: auto;
@@ -184,6 +186,13 @@
 
 .postButton{
   position: relative;
+}
+
+.closeButton{
+  background-color: transparent;
+  position: fixed;
+  top: 5rem;
+  right: 5rem;
 }
 
 .postTipInput {

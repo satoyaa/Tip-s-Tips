@@ -5,7 +5,7 @@ python用の出力(オプションO2)標準の最適化
 gcc -O2 -shared -o libGA.dll ga.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c
 
 python用の出力(オプションO2)標準の最適化 シフト突然変異あり，高さを評価値計算に用いる
-gcc ga_shift_with_height.c fitness_with_height.c initialize.c selection.c crossover.c mutation.c mutation_shift.c collision.c save.c
+gcc -O2 -shared -o libGA.dll ga_shift_with_height_honban.c fitness_with_height.c initialize.c selection.c crossover.c mutation.c mutation_shift.c collision.c
 
 GA構築用（GAテスト）
 gcc main.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c save.c

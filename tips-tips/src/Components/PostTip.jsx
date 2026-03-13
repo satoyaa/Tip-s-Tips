@@ -1,4 +1,6 @@
 import { useState, memo } from "react";
+import { CircleX } from 'lucide-react';
+
 
 
 const PostTip = memo(({isPop, setIsPop}) => {
@@ -62,7 +64,13 @@ const PostTip = memo(({isPop, setIsPop}) => {
             </div>
         </div>
         
-        <button className="postButton" onClick={()=>setIsPop(false)}>閉じる</button>
+        <button className="closeButton" onClick={()=>setIsPop(false)}>
+            <CircleX
+            size={50}        // サイズ
+            color="#ffffff"    // 色
+            strokeWidth={2}  // 線の太さ
+            />
+        </button>
         </div>
         
     );
