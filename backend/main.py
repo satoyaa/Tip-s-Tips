@@ -110,7 +110,8 @@ class DataPoint(ctypes.Structure):
     ]
     
 #タグリスト
-tag_list = ["焼き方", "ゆで方", "煮詰め方", "揚げ方", "切り方", "味付け"]
+tag_list = ["肉", "魚", "野菜", "麺", "鍋", "焼き鳥", "カレー", "パン", "卵"]
+sub_tags = ["煮る", "焼く", "蒸す", "揚げる", "生", "切る", "混ぜる", "盛り付ける"]
 
 #C言語ライブラリの読込
 lib = ctypes.CDLL('./libGA.dll')
@@ -216,27 +217,76 @@ def get_tips(tag: Optional[str] = Query(None)): # クエリパラメータ 'tag'
             display_tips[i].tipTop = c_array[i].y
     return display_tips
 
+def auto_tag_fallback(title: str, explanation: str) -> dict:
+    """キーワードマッチングによるフォールバックタグ付け"""
+    text = title + " " + explanation
+    matched_main = [t for t in tag_list if t in text]
+    matched_sub = [t for t in sub_tags if t in text]
+    return {"mainTags": matched_main[:2], "subTags": matched_sub[:3]}
+
+
+async def auto_tag_with_gemini(title: str, explanation: str) -> dict:
+    """Gemini APIを使ってユーザ投稿にタグを付与する"""
+    if not GEMINI_API_KEY:
+        print("GEMINI_API_KEY 未設定 → キーワードマッチングを使用")
+        return auto_tag_fallback(title, explanation)
+
+    prompt = (
+        "以下の料理Tipに対して、適切なタグを選択してください。\n"
+        f"タイトル: {title}\n"
+        f"説明: {explanation}\n\n"
+        f"mainTags（食材・種類）は以下のリストから最大2つ選んでください: {tag_list}\n"
+        f"subTags（調理方法）は以下のリストから最大3つ選んでください: {sub_tags}\n\n"
+        "JSONのみを出力してください:\n"
+        '{"mainTags": ["..."], "subTags": ["..."]}'
+    )
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.3, "responseMimeType": "application/json"},
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await client.post(GEMINI_API_URL, params={"key": GEMINI_API_KEY}, json=payload)
+        if res.status_code != 200:
+            print(f"Geminiタグ付けエラー: {res.status_code} → キーワードマッチングを使用")
+            return auto_tag_fallback(title, explanation)
+        text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        result = json.loads(text)
+        return {
+            "mainTags": [t for t in result.get("mainTags", []) if t in tag_list],
+            "subTags": [t for t in result.get("subTags", []) if t in sub_tags],
+        }
+    except Exception as e:
+        print(f"Geminiタグ付け失敗: {e} → キーワードマッチングを使用")
+        return auto_tag_fallback(title, explanation)
+
+
 #ユーザ投稿の新しいデータの追加
 @app.post("/tips", response_model=Tip)
-def create_tip(tip_in: TipCreate):
+async def create_tip(tip_in: TipCreate):
     db = read_db()
-    
+
+    # 自動タグ付け（Gemini API → フォールバック）
+    tags = await auto_tag_with_gemini(tip_in.tipTitle, tip_in.tipExplanation)
+
     # バックエンド側でデータを補間
     new_tip_data = {
         "id": str(uuid.uuid4())[:8], # 重複しないIDを生成（例: "a1b2c3d4"）
         "tipTitle": tip_in.tipTitle,
         "tipExplanation": tip_in.tipExplanation,
-        "mainTags": [],      # 初期値は空配列
-        "subTags": [],       # 初期値は空配列
+        "mainTags": tags["mainTags"],
+        "subTags": tags["subTags"],
         "source": [],        # 初期値は空配列
         "tipLikes": 0,       # 初期値は0
         "tipDislikes": 0,    # 初期値は0
         "upLoadDate": datetime.now().strftime("%Y/%m/%d") # 現在の日付
     }
-    
+
     db.append(new_tip_data)
     write_db(db)
-    
+
     return new_tip_data
 
 #評価に関するデータの更新
