@@ -6138,5 +6138,35 @@
     "tipLikes": 0,
     "tipDislikes": 0,
     "upLoadDate": "2011/04/13"
+  },
+  {
+    "id": "43e6000c",
+    "tipTitle": "カニ",
+    "tipExplanation": "カニは煮るとおいしいです",
+    "mainTags": [
+      "魚"
+    ],
+    "subTags": [
+      "煮る"
+    ],
+    "source": [],
+    "tipLikes": 0,
+    "tipDislikes": 0,
+    "upLoadDate": "2026/03/14"
+  },
+  {
+    "id": "2e09b177",
+    "tipTitle": "カレー",
+    "tipExplanation": "カレーは揚げるとおいしくなります",
+    "mainTags": [
+      "カレー"
+    ],
+    "subTags": [
+      "揚げる"
+    ],
+    "source": [],
+    "tipLikes": 0,
+    "tipDislikes": 0,
+    "upLoadDate": "2026/03/14"
   }
 ]
