@@ -1,25 +1,26 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 from typing import Dict, List, Optional
 from datetime import datetime
 import random
 import uuid
-import json
-import os
 import ctypes
+from sqlalchemy.orm import Session
+import models
+from database import engine, get_db
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 # CORS設定（Reactからのアクセス許可）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"], # 本番環境ではCloudFrontのURLを指定する
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-DB_FILE = "dbAll.json"
 
 # --- データ構造の定義 ---
 
@@ -75,7 +76,8 @@ class DataPoint(ctypes.Structure):
 tag_list = ["焼き方", "ゆで方", "煮詰め方", "揚げ方", "切り方", "味付け"]
 
 #C言語ライブラリの読込
-lib = ctypes.CDLL('./libGA2.dll')
+#lib = ctypes.CDLL('./libGA2.dll') #Windows向け
+lib = ctypes.CDLL('./libGA.so') #Linux向け
 TagListType = (ctypes.c_char * 64) * 100
 """
 lib.ga_main.argtypes = [
@@ -130,47 +132,35 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
         
     return c_tag_array, num_tags
 
-def read_db() -> List[dict]:
-    if not os.path.exists(DB_FILE):
-        return []
-    with open(DB_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def write_db(data: List[dict]):
-    with open(DB_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
 #検索表示用のデータ読み込み
 @app.get("/tips", response_model=List[TipDisplay])
-def get_tips(tag: Optional[str] = Query(None)): # クエリパラメータ 'tag' を定義
-    raw_data = read_db()
+def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): # クエリパラメータ 'tag' を定義
+    query = db.query(models.TipsDatabase)
     
     # 1. バックエンド側でのフィルタリング
     if tag:
         # mainTagsの中に指定された文字列が含まれるものだけを抽出
-        filtered_data = [item for item in raw_data if tag in item.get("mainTags", [])]
-    else:
-        filtered_data = raw_data
+        query = query.filter(models.TipsDatabase.mainTags.astext.ilike(f'%"{tag}"%'))
+    
+    filtered_data = query.all()
     
     # 2. 絞り込み後のリストに対して表示用計算を行う
     display_tips = []
-    for index, item in enumerate(filtered_data):
-        tip_left = 0
-        tip_top = 0
+    for item in filtered_data:
         tip_rotate = (random.random() - 0.5) * 10
         
         display_tips.append(TipDisplay(
-            id=item["id"],
-            tipTitle=item["tipTitle"],
-            tipExplanation=item["tipExplanation"],
-            tipTop=tip_top,
-            tipLeft=tip_left,
+            id=item.id,
+            tipTitle=item.tipTitle,
+            tipExplanation=item.tipExplanation,
+            tipTop=0.0,
+            tipLeft=0.0,
             tipRotate=tip_rotate,
-            subTags=item.get("subTags", []),
-            source=item["source"],
-            tipLikes=item["tipLikes"],
-            tipDislikes=item["tipDislikes"],
-            upLoadDate=item["upLoadDate"]
+            subTags=item.subTags,
+            source=item.source,
+            tipLikes=item.tipLikes,
+            tipDislikes=item.tipDislikes,
+            upLoadDate=item.upLoadDate
         ))
         
     c_array, num_tips = convert_tips_to_c_array(display_tips)
@@ -185,59 +175,69 @@ def get_tips(tag: Optional[str] = Query(None)): # クエリパラメータ 'tag'
 
 #ユーザ投稿の新しいデータの追加
 @app.post("/tips", response_model=Tip)
-def create_tip(tip_in: TipCreate):
-    db = read_db()
-    
+def create_tip(tip_in: TipCreate, db: Session = Depends(get_db)):
     # バックエンド側でデータを補間
-    new_tip_data = {
-        "id": str(uuid.uuid4())[:8], # 重複しないIDを生成（例: "a1b2c3d4"）
-        "tipTitle": tip_in.tipTitle,
-        "tipExplanation": tip_in.tipExplanation,
-        "mainTags": [],      # 初期値は空配列
-        "subTags": [],       # 初期値は空配列
-        "source": [],        # 初期値は空配列
-        "tipLikes": 0,       # 初期値は0
-        "tipDislikes": 0,    # 初期値は0
-        "upLoadDate": datetime.now().strftime("%Y/%m/%d") # 現在の日付
+    new_tip = models.TipsDatabase(
+        id=str(uuid.uuid4())[:8],  # 重複しないIDを生成（例: "a1b2c3d4"）
+        tipTitle=tip_in.tipTitle,
+        tipExplanation=tip_in.tipExplanation,
+        mainTags=[],      # 初期値は空配列
+        subTags=[],       # 初期値は空配列
+        source=[],        # 初期値は空配列
+        tipLikes=0,       # 初期値は0
+        tipDislikes=0,    # 初期値は0
+        upLoadDate=datetime.now().strftime("%Y/%m/%d") # 現在の日付
+    )
+    
+    db.add(new_tip)
+    db.commit()
+    db.refresh(new_tip)
+    
+    return {
+        "id": new_tip.id,
+        "tipTitle": new_tip.tipTitle,
+        "tipExplanation": new_tip.tipExplanation,
+        "mainTags": new_tip.mainTags,
+        "subTags": new_tip.subTags,
+        "source": new_tip.source,
+        "tipLikes": new_tip.tipLikes,
+        "tipDislikes": new_tip.tipDislikes,
+        "upLoadDate": new_tip.upLoadDate
     }
-    
-    db.append(new_tip_data)
-    write_db(db)
-    
-    return new_tip_data
 
 #評価に関するデータの更新
 @app.patch("/tips/{tip_id}/likes", response_model=Tip)
-def update_tip_likes(tip_id: str, update_data: LikeUpdate):
-    db = read_db()
+def update_tip_likes(tip_id: str, update_data: LikeUpdate, db: Session = Depends(get_db)):
+    tip = db.query(models.TipsDatabase).filter(models.TipsDatabase.id == tip_id).first()
     
-    # 対象のデータを検索
-    target_index = None
-    for i, item in enumerate(db):
-        if item["id"] == tip_id:
-            target_index = i
-            break
-    
-    if target_index is None:
+    if not tip:
         raise HTTPException(status_code=404, detail="Tip not found")
     
     # データを更新
-    db[target_index]["tipLikes"] = update_data.tipLikes
-    
-    # 保存
-    write_db(db)
+    tip.tipLikes = update_data.tipLikes
+    db.commit()
+    db.refresh(tip)
 
-    return db[target_index]
+    return {
+        "id": tip.id,
+        "tipTitle": tip.tipTitle,
+        "tipExplanation": tip.tipExplanation,
+        "mainTags": tip.mainTags,
+        "subTags": tip.subTags,
+        "source": tip.source,
+        "tipLikes": tip.tipLikes,
+        "tipDislikes": tip.tipDislikes,
+        "upLoadDate": tip.upLoadDate
+    }
 
 
 # 複数tipのいいね数をまとめて更新
 @app.patch("/tips/batch-likes")
-def update_tips_batch_likes(batch: LikesBatchUpdate):
-    db = read_db()
+def update_tips_batch_likes(batch: LikesBatchUpdate, db: Session = Depends(get_db)):
+    for tip_id, likes_count in batch.updates.items():
+        tip = db.query(models.TipsDatabase).filter(models.TipsDatabase.id == tip_id).first()
+        if tip:
+            tip.tipLikes = likes_count
     
-    for i, item in enumerate(db):
-        if item["id"] in batch.updates:
-            item["tipLikes"] = batch.updates[item["id"]]
-    
-    write_db(db)
+    db.commit()
     return {"updated": list(batch.updates.keys())}
