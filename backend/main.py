@@ -179,12 +179,43 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
 def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): # クエリパラメータ 'tag' を定義
     query = db.query(models.TipsDatabase)
 
+    normalized_tag = (tag or "").replace("\u3000", " ").strip()
+
+    # 開発用コマンド: 検索欄に "develop show-all-data" と入力するとDB全件をコンソール出力
+    if normalized_tag.lower() == "develop show-all-data":
+        all_data = query.all()
+        payload = [
+            {
+                "id": item.id,
+                "tipTitle": item.tipTitle,
+                "tipExplanation": item.tipExplanation,
+                "mainTags": item.mainTags,
+                "subTags": item.subTags,
+                "source": item.source,
+                "tipLikes": item.tipLikes,
+                "tipDislikes": item.tipDislikes,
+                "upLoadDate": item.upLoadDate,
+            }
+            for item in all_data
+        ]
+        print("[develop show-all-data] DB全件出力開始")
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        print("[develop show-all-data] DB全件出力終了")
+        normalized_tag = ""
+
     # 1. バックエンド側でのフィルタリング
-    if tag:
-        # mainTagsの中に指定された文字列が含まれるものだけを抽出
-        # cast(JSON, String) は SQLAlchemy 2.0 で .astext エラーになるため text() を使用
+    if normalized_tag:
+        # mainTags が JSON 配列なら要素を走査、そうでなければ文字列として一致確認
+        # （db によっては JSON が文字列として保存される場合があるため）
         query = query.filter(
-            text('cast("mainTags" as text) ILIKE :p').bindparams(p=f'%"{tag}"%')
+            text(
+                "(" +
+                "(json_typeof(\"mainTags\") = 'array' AND EXISTS (" +
+                "  SELECT 1 FROM json_array_elements_text(\"mainTags\") AS t WHERE t ILIKE :p" +
+                "))" +
+                " OR (json_typeof(\"mainTags\") <> 'array' AND \"mainTags\"::text ILIKE :p)" +
+                ")"
+            ).bindparams(p=f'%{normalized_tag}%')
         )
 
     filtered_data = query.all()
@@ -207,6 +238,10 @@ def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): #
             tipDislikes=item.tipDislikes,
             upLoadDate=item.upLoadDate
         ))
+
+    if len(display_tips) <= 0:
+        print("[GA] skipped: n <= 0 (no tips to arrange)")
+        return display_tips
 
     c_array, num_tips = convert_tips_to_c_array(display_tips)
     c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
