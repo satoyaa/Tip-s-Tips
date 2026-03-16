@@ -12,8 +12,8 @@ double fitness[POPULATION];
 double best;
 int best_index = 0;
 int maxWidth = 1280;
-int tipWidth = 247;
-int tipHeight = 176;
+int tipWidth = 257;
+int tipHeight = 186;
 double crossover_rate = 0.1;
 double mutation_rate = 0.5;
 double mutation_shift_rate = 0.2;
@@ -107,6 +107,19 @@ int main(){
     }
     
     ga();
+    for (int j = 0; j < max_tips; j++) {
+        if (genes[0][j].x != -1 && genes[0][j].y != -1) {
+            dataset[j].x = genes[0][j].x+cos(dataset[j].rotate * M_PI / 180.0)*5-sin(dataset[j].rotate * M_PI / 180.0)*5;
+            dataset[j].y = genes[0][j].y+sin(dataset[j].rotate * M_PI / 180.0)*5+cos(dataset[j].rotate * M_PI / 180.0)*5;
+        }
+    }
+    //　データセットの中身を確認
+    for (int i = 0; i < max_tips; i++)
+    {
+        printf("Item[%d]: x = %f, y = %f, rotate = %f, tags = {%s, %s, %s}\n", i, dataset[i].x, dataset[i].y, dataset[i].rotate, dataset[i].tags[0], dataset[i].tags[1], dataset[i].tags[2]);
+    }
+    
+
     save("data.dat");
     /*
     printf("Fitness of first 5 individuals after selection:\n");

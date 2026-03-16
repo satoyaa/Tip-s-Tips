@@ -65,12 +65,12 @@ void save(const char *filename) {
         }
 
         // tipの中心座標を計算
-        double x_center = genes[best_index][i].x + tipWidth / 2.0;
-        double y_center = genes[best_index][i].y + tipHeight / 2.0;
+        double x_center = genes[best_index][i].x + cos(dataset[i].rotate * M_PI / 180.0)*5-sin(dataset[i].rotate * M_PI / 180.0)*5 + tipWidth / 2.0;
+        double y_center = genes[best_index][i].y + sin(dataset[i].rotate * M_PI / 180.0)*5+cos(dataset[i].rotate * M_PI / 180.0)*5 + tipHeight / 2.0;
         
         // tipのサイズ(中心からの距離)
-        double x_delta = tipWidth / 2.0;
-        double y_delta = tipHeight / 2.0;
+        double x_delta = (tipWidth-10) / 2.0;
+        double y_delta = (tipHeight-10) / 2.0;
 
         // 回転角度 (dataset[i].rotate) に基づく中心回転
         double angle = dataset[i].rotate * M_PI / 180.0;
@@ -136,8 +136,11 @@ void save(const char *filename) {
             break;
         }
 
-        double x_center = genes[best_index][i].x + tipWidth / 2.0;
-        double y_center = genes[best_index][i].y + tipHeight / 2.0;
+        //double x_center = genes[best_index][i].x + cos(dataset[i].rotate * M_PI / 180.0)*5+sin(dataset[i].rotate * M_PI / 180.0)*5;
+        //double y_center = genes[best_index][i].y + sin(dataset[i].rotate * M_PI / 180.0)*5-cos(dataset[i].rotate * M_PI / 180.0)*5;
+
+        double x_center = genes[best_index][i].x + cos(dataset[i].rotate * M_PI / 180.0)*5 - sin(dataset[i].rotate * M_PI / 180.0)*5 + tipWidth / 2.0;
+        double y_center = genes[best_index][i].y + sin(dataset[i].rotate * M_PI / 180.0)*5 + cos(dataset[i].rotate * M_PI / 180.0)*5 + tipHeight / 2.0;
 
         char label[64] = "";
         for (int j = 0; j < 3; j++) {

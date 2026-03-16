@@ -45,7 +45,7 @@ void mutation_shift(){
                         break;
                     }
                 }
-                if(new_x < 0 || new_x > maxWidth - tipWidth || new_y < 0 || new_y > maxWidth - tipHeight){
+                if(new_x < 0 || new_x > maxWidth - tipWidth || new_y < 0){
                     duplicate = 1; // はみ出しも重複と同様に扱う
                 }
                 if(!duplicate){

@@ -12,8 +12,8 @@ double fitness[POPULATION];
 double best;
 int best_index = 0;
 int maxWidth = 1280;
-int tipWidth = 247;
-int tipHeight = 176;
+int tipWidth = 257;
+int tipHeight = 186;
 double crossover_rate = 0.1;
 double mutation_rate = 0.5;
 double mutation_shift_rate = 0.3;
@@ -68,8 +68,8 @@ int ga_main(DataItem* dataset, int n, char tagList[100][64], int num_tags) {
     //datasetの中身を最良個体に置き換える
     for (int j = 0; j < max_tips; j++) {
         if (genes[0][j].x != -1 && genes[0][j].y != -1) {
-            dataset[j].x = genes[0][j].x;
-            dataset[j].y = genes[0][j].y;
+            dataset[j].x = genes[0][j].x+cos(dataset[j].rotate * M_PI / 180.0)*5+sin(dataset[j].rotate * M_PI / 180.0)*5+tipWidth / 2.0;
+            dataset[j].y = genes[0][j].y+sin(dataset[j].rotate * M_PI / 180.0)*5-cos(dataset[j].rotate * M_PI / 180.0)*5+tipHeight / 2.0;
         }
     }
     return 0;
