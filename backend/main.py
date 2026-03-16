@@ -15,6 +15,7 @@ import ctypes
 import httpx
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
+from sqlalchemy import String, cast, text
 
 import models
 from database import engine, get_db, SessionLocal
@@ -181,7 +182,10 @@ def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): #
     # 1. バックエンド側でのフィルタリング
     if tag:
         # mainTagsの中に指定された文字列が含まれるものだけを抽出
-        query = query.filter(models.TipsDatabase.mainTags.astext.ilike(f'%"{tag}"%'))
+        # cast(JSON, String) は SQLAlchemy 2.0 で .astext エラーになるため text() を使用
+        query = query.filter(
+            text('cast("mainTags" as text) ILIKE :p').bindparams(p=f'%"{tag}"%')
+        )
 
     filtered_data = query.all()
 
