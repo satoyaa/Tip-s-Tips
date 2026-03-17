@@ -177,7 +177,12 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
 
 #検索表示用のデータ読み込み
 @app.get("/tips", response_model=List[TipDisplay])
-def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): # クエリパラメータ 'tag' を定義
+def get_tips(
+    tag: Optional[str] = Query(None),
+    sort: Optional[str] = Query(None),
+    order: Optional[str] = Query("desc"),
+    db: Session = Depends(get_db),
+):  # クエリパラメータ 'tag' を定義
     query = db.query(models.TipsDatabase)
 
     normalized_tag = (tag or "").replace("\u3000", " ").strip()
@@ -219,7 +224,20 @@ def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): #
             ).bindparams(p=f'%{normalized_tag}%')
         )
 
+    # 2. ソート（人気順）
+    if sort == "likes":
+        if order == "asc":
+            query = query.order_by(models.TipsDatabase.tipLikes.asc())
+        else:
+            query = query.order_by(models.TipsDatabase.tipLikes.desc())
+
     filtered_data = query.all()
+
+    # ソート（人気順）で取得した際の並び順をログ出力
+    if sort == "likes":
+        order_label = "ASC" if order == "asc" else "DESC"
+        ordered = [(item.id, item.tipLikes) for item in filtered_data]
+        print(f"[sort=likes order={order_label}] {ordered}")
 
     # 2. 絞り込み後のリストに対して表示用計算を行う
     display_tips = []

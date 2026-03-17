@@ -1,28 +1,52 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 
-const Tip = ({data, setTips}) => {
-    const [tipLike, setTipLike] = useState(data.tipLikes);
-    const [isClicked, setIsClicked] = useState(false);
+const Tip = ({ data, setTips }) => {
+  const [tipLike, setTipLike] = useState(data.tipLikes);
+  const [isClicked, setIsClicked] = useState(false);
 
-    // propsのtipLikesが変わったらローカル状態に反映
-    useEffect(() => {
-        setTipLike(data.tipLikes);
-    }, [data.tipLikes]);
+  // propsのtipLikesが変わったらローカル状態に反映
+  useEffect(() => {
+    setTipLike(data.tipLikes);
+  }, [data.tipLikes]);
 
-    const changeLikes = () => {
-        const nextLike = isClicked ? tipLike - 1 : tipLike + 1;
-        setTipLike(nextLike);
+  const changeLikes = async () => {
+    const previousLike = tipLike;
+    const previousClicked = isClicked;
+    const nextLike = isClicked ? tipLike - 1 : tipLike + 1;
 
-        // 親のtips配列も更新しておく
-        setTips((prevTips) =>
-            prevTips.map((tip) =>
-                tip.id === data.id ? { ...tip, tipLikes: nextLike } : tip
-            )
-        );
+    // 先にUIを更新して、API が遅い場合にもレスポンスを良くする
+    setTipLike(nextLike);
+    setIsClicked(!isClicked);
+    setTips((prevTips) =>
+      prevTips.map((tip) =>
+        tip.id === data.id ? { ...tip, tipLikes: nextLike } : tip
+      )
+    );
 
-        setIsClicked(!isClicked);
-        console.log(isClicked);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/tips/${data.id}/likes`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tipLikes: nextLike }),
+        }
+      );
+      if (!res.ok) {
+        throw new Error("Failed to update like");
+      }
+    } catch (error) {
+      console.error("Failed to persist like:", error);
+      // 失敗したら元に戻す
+      setTipLike(previousLike);
+      setIsClicked(previousClicked);
+      setTips((prevTips) =>
+        prevTips.map((tip) =>
+          tip.id === data.id ? { ...tip, tipLikes: previousLike } : tip
+        )
+      );
     }
+  };
 
     return(
         <div className="tip" style={{top:`${data.tipTop}px`, left:`${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`}}>
