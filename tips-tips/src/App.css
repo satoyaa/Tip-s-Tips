@@ -83,6 +83,21 @@
   display: block;
 }
 
+/* グリッドレイアウト（人気順を表示する時用） */
+.tipsBoard.grid{
+  display: grid;
+  grid-template-columns: repeat(5, minmax(200px, 1fr));
+  gap: 1.2rem;
+  position: static;
+  height: auto;
+  padding: 1.2rem;
+}
+
+.tipsBoard.grid .tip{
+  position: relative;
+  transform: none;
+}
+
 .tip {
   position: absolute;
   background-color: #ffffff;

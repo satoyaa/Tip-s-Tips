@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const Tip = ({ data, setTips }) => {
+const Tip = ({ data, setTips, layout }) => {
   const [tipLike, setTipLike] = useState(data.tipLikes);
   const [isClicked, setIsClicked] = useState(false);
 
@@ -49,18 +49,27 @@ const Tip = ({ data, setTips }) => {
   };
 
     return(
-        <div className="tip" style={{top:`${data.tipTop}px`, left:`${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`}}>
-            <a href={data.tipDetails} className="tipDetails" aria-label="詳細を見る" />
-            <h2 className="tipTitle">{data.tipTitle}</h2>
-            <p className="tipText">{data.tipExplanation}</p>
-            <div className="tipFooter">
-                <span className="tipLike">
-                    <span className="tipHeart" aria-hidden="true" onClick={() => changeLikes()}>👍</span>
-                    {tipLike}
-                </span>
-            </div>
-        </div>
-    );
+        <div
+      className="tip"
+      style={
+        layout === "grid"
+          ? {}
+          : { top: `${data.tipTop}px`, left: `${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)` }
+      }
+    >
+      <a href={data.tipDetails} className="tipDetails" aria-label="詳細を見る" />
+      <h2 className="tipTitle">{data.tipTitle}</h2>
+      <p className="tipText">{data.tipExplanation}</p>
+      <div className="tipFooter">
+        <span className="tipLike">
+          <span className="tipHeart" aria-hidden="true" onClick={() => changeLikes()}>
+            👍
+          </span>
+          {tipLike}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export default Tip;

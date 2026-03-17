@@ -62,6 +62,8 @@ function App() {
     setSortBy("");
   };
 
+  const layout = sortBy === "likes" ? "grid" : "free";
+
   return (
     <>
       <h1 
@@ -90,7 +92,12 @@ function App() {
       {/* 人気順ソート */}
       <SortControls sortBy={sortBy} setSortBy={setSortBy} />
 
-      <TipsBoard isDisplay={isDisplay} tips={tips} setTips={setTips}></TipsBoard>
+      <TipsBoard
+        isDisplay={isDisplay}
+        tips={tips}
+        setTips={setTips}
+        layout={layout}
+      ></TipsBoard>
     </>
   )
 }
