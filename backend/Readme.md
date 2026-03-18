@@ -7,3 +7,6 @@ if normalized_tag == "Gemini-Retry-Response":
 # 開発用コマンド: 検索欄に "develop show-all-data" と入力するとDB全件をコンソール出力
 if normalized_tag.lower() == "develop show-all-data":
     all_data = query.all()
+
+# 暫定的なエラー回避
+main.pyの313行目
