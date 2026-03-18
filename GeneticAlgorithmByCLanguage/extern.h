@@ -45,7 +45,7 @@ extern int num_tags;
 extern char Taglist[100][64];
 extern double fitness[POPULATION];
 extern TIPS genes[POPULATION][MAX_TIPS]; 
-extern DataItem dataset[50];
+extern DataItem dataset[500];
 extern double best;
 extern int best_index;
 extern int maxWidth;

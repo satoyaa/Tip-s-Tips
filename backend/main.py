@@ -308,6 +308,13 @@ async def get_tips(
         print("[GA] skipped: n <= 0 (no tips to arrange)")
         return display_tips
 
+    # C側ライブラリの内部配列サイズには上限があるため、念の為上限以内に切り詰める
+    # (libGA.so で MAX_TIPS 100 程度が固定されている想定)
+    MAX_TIPS = 100
+    if len(display_tips) > MAX_TIPS:
+        print(f"[GA] trimmed display_tips from {len(display_tips)} to {MAX_TIPS} to avoid C buffer overflow")
+        display_tips = display_tips[:MAX_TIPS]
+
     c_array, num_tips = convert_tips_to_c_array(display_tips)
     c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
     lib.ga_main(c_array, num_tips, c_tag_array, num_tags)
@@ -413,6 +420,8 @@ async def fetch_category_list() -> dict:
         res = await client.get(CATEGORY_LIST_URL, params=params)
     if res.status_code != 200:
         raise Exception(f"カテゴリ一覧の取得に失敗: {res.status_code}")
+
+    print("[楽天API] カテゴリ一覧取得完了")
     return res.json()
 
 
@@ -444,6 +453,8 @@ async def fetch_category_ranking(category_id: str) -> dict:
         res = await client.get(CATEGORY_RANKING_URL, params=params)
     if res.status_code != 200:
         raise Exception(f"ランキング取得失敗: {res.status_code}")
+
+    print(f"[楽天API] カテゴリランキング取得完了: {category_id}")
     return res.json()
 
 
@@ -478,7 +489,7 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
     prompt = (
         "以下の楽天レシピのデータを、料理Tipsカードとして表示するために加工してください。\n"
         "料理の材料毎に、材料の調理のコツや方法について以下のJSON形式で出力してください。\n"
-        "JSONの配列のみを出力してください。\n"
+        f"このリストには {len(recipes)} 件のレシピがあります。必ず {len(recipes)} 件の要素を持つJSON配列（[... ]）のみを出力してください。\n"
         "出力形式:\n"
         '[\n  {\n    "tipTitle": "短く簡潔なタイトル",\n'
         '    "tipExplanation": "簡潔な料理のコツ（40文字以内）",\n'
@@ -503,6 +514,7 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
         # Geminiレスポンスをログに出力
         try:
             response_json = res.json()
+            print(f"[Gemini API] レスポンス取得完了")
             print(f"[Gemini API] レスポンス: {json.dumps(response_json, ensure_ascii=False)}")
         except Exception as e:
             print(f"[Gemini API] レスポンスJSON変換失敗: {e} / raw: {res.text}")
@@ -510,6 +522,17 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
 
         text = response_json["candidates"][0]["content"]["parts"][0]["text"]
         summaries = json.loads(text)
+
+        # デバッグ: recipes[i] と summaries[i] の対応をログ出力（ずれがないか確認する）
+        max_check = min(len(recipes), len(summaries))
+        print(f"[Gemini対応確認] recipes={len(recipes)} summaries={len(summaries)}")
+        for i in range(max_check):
+            print(
+                f"[Gemini対応確認] idx={i} recipeTitle={recipes[i].get('recipeTitle')!r} "
+                f"=> summaryTitle={summaries[i].get('tipTitle')!r}"
+            )
+        if len(recipes) != len(summaries):
+            print(f"[Gemini対応確認] 件数不一致: recipes={len(recipes)} summaries={len(summaries)}")
     except Exception as e:
         # 例外の種類・メッセージ・スタックトレースをすべてログに出力
         print(f"Gemini API失敗: {type(e).__name__} {repr(e)}")
