@@ -11,6 +11,7 @@ import uuid
 import json
 import os
 import ctypes
+import traceback
 
 import httpx
 from dotenv import load_dotenv
@@ -175,9 +176,48 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
 
     return c_tag_array, num_tags
 
+async def rerun_gemini_on_all_tips(db: Session) -> int:
+    """既存DBデータに対してGemini APIを再実行し、要約内容を更新する"""
+    tips = db.query(models.TipsDatabase).all()
+    if not tips:
+        print("[Gemini-Retry-Response] 更新対象のデータがありません")
+        return 0
+
+    recipes = []
+    ids = []
+    for tip in tips:
+        ids.append(tip.id)
+        recipes.append({
+            "recipeTitle": tip.tipTitle,
+            "recipeDescription": tip.tipExplanation,
+            "recipeMaterial": tip.mainTags,
+            "categoryName": tip.subTags[0] if tip.subTags else "",
+            # source/url は再生成しないため空にしておく
+            "recipeUrl": "",
+            "recipePublishday": "",
+        })
+
+    summaries = await summarize_with_gemini(recipes)
+
+    updated = 0
+    for tip_id, summary in zip(ids, summaries):
+        tip = db.query(models.TipsDatabase).filter(models.TipsDatabase.id == tip_id).first()
+        if not tip:
+            continue
+        tip.tipTitle = summary.get("tipTitle", tip.tipTitle)
+        tip.tipExplanation = summary.get("tipExplanation", tip.tipExplanation)
+        tip.mainTags = summary.get("mainTags", tip.mainTags)
+        tip.subTags = summary.get("subTags", tip.subTags)
+        updated += 1
+
+    db.commit()
+    print(f"[Gemini-Retry-Response] 更新完了: {updated}件")
+    return updated
+
+
 #検索表示用のデータ読み込み
 @app.get("/tips", response_model=List[TipDisplay])
-def get_tips(
+async def get_tips(
     tag: Optional[str] = Query(None),
     sort: Optional[str] = Query(None),
     order: Optional[str] = Query("desc"),
@@ -186,6 +226,12 @@ def get_tips(
     query = db.query(models.TipsDatabase)
 
     normalized_tag = (tag or "").replace("\u3000", " ").strip()
+
+    # 特殊コマンド: Geminiへの再送信と内容更新
+    if normalized_tag == "Gemini-Retry-Response":
+        print("[Gemini-Retry-Response] Geminiへの再送信を実行します")
+        await rerun_gemini_on_all_tips(db)
+        normalized_tag = ""
 
     # 開発用コマンド: 検索欄に "develop show-all-data" と入力するとDB全件をコンソール出力
     if normalized_tag.lower() == "develop show-all-data":
@@ -448,15 +494,26 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             res = await client.post(GEMINI_API_URL, params={"key": GEMINI_API_KEY}, json=payload)
         if res.status_code != 200:
             print(f"Gemini APIエラー: {res.status_code} {res.text}")
             return fallback_transform(recipes)
-        text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+        # Geminiレスポンスをログに出力
+        try:
+            response_json = res.json()
+            print(f"[Gemini API] レスポンス: {json.dumps(response_json, ensure_ascii=False)}")
+        except Exception as e:
+            print(f"[Gemini API] レスポンスJSON変換失敗: {e} / raw: {res.text}")
+            return fallback_transform(recipes)
+
+        text = response_json["candidates"][0]["content"]["parts"][0]["text"]
         summaries = json.loads(text)
     except Exception as e:
-        print(f"Gemini API失敗: {e}")
+        # 例外の種類・メッセージ・スタックトレースをすべてログに出力
+        print(f"Gemini API失敗: {type(e).__name__} {repr(e)}")
+        print(traceback.format_exc())
         return fallback_transform(recipes)
 
     tips = []
