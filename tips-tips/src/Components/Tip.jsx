@@ -1,16 +1,19 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 
-const Tip = ({data, setTips}) => {
+const Tip = ({ data, setTips, layout }) => {
     const [tipLike, setTipLike] = useState(data.tipLikes);
     const [isClicked, setIsClicked] = useState(false);
 
     // propsのtipLikesが変わったらローカル状態に反映
     useEffect(() => {
-        setTipLike(data.tipLikes);
-    }, [data.tipLikes]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTipLike(data.tipLikes);
+  }, [data.tipLikes]);
 
     const changeLikes = () => {
         const nextLike = isClicked ? tipLike - 1 : tipLike + 1;
+        console.log("[Tip] changeLikes called", { id: data.id, nextLike });
+
         setTipLike(nextLike);
 
         // 親のtips配列も更新しておく
@@ -21,12 +24,46 @@ const Tip = ({data, setTips}) => {
         );
 
         setIsClicked(!isClicked);
-        console.log(isClicked);
+
+        const url = `${import.meta.env.VITE_API_URL}/tips/${data.id}/likes`;
+        console.log("[Tip] sending PATCH", { url, body: { tipLikes: nextLike } });
+
+        fetch(url, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tipLikes: nextLike }),
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}`);
+            }
+            return res.json();
+          })
+          .then((json) => {
+            console.log("[Tip] PATCH response", json);
+          })
+          .catch((error) => {
+            console.error("[Tip] Failed to persist like:", error);
+            // 失敗したら元に戻す
+            setTipLike(tipLike);
+            setIsClicked(isClicked);
+            setTips((prevTips) =>
+              prevTips.map((tip) =>
+                tip.id === data.id ? { ...tip, tipLikes: tipLike } : tip
+              )
+            );
+          });
     }
 
     return(
-        <div className="tip" style={{top:`${data.tipTop}px`, left:`${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`}}>
-            {/*<div className="tip" style={{top:`${data.tipTop}px`, left:`${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`, background: `#{${data.color}}`}}>*/}
+        <div
+      className="tip"
+      style={
+        layout === "grid"
+          ? {}
+          : { top: `${data.tipTop}px`, left: `${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)` }
+      }
+    >
             <a href={data.tipDetails} className="tipDetails" aria-label="詳細を見る" />
             <h2 className="tipTitle">{data.tipTitle}</h2>
             <p className="tipText">{data.tipExplanation}</p>

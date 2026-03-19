@@ -6,11 +6,13 @@ from pydantic import BaseModel, HttpUrl
 from typing import Dict, List, Optional
 from datetime import datetime
 import asyncio
+import logging
 import random
 import uuid
 import json
 import os
 import ctypes
+import traceback
 
 import httpx
 from dotenv import load_dotenv
@@ -21,6 +23,9 @@ import models
 from database import engine, get_db, SessionLocal
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from collector import collect_all_recipes, collect_recipes_for_keyword, periodic_collection
 
@@ -59,9 +64,13 @@ app = FastAPI(lifespan=lifespan)
 # CORS設定（Reactからのアクセス許可）
 app.add_middleware(
     CORSMiddleware,
+<<<<<<< HEAD
     allow_origins=["https://tips-tips.jp",
                    "http://localhost:5173",], # 本番環境ではCloudFrontのURLを指定する
     allow_credentials=True,
+=======
+    allow_origins=["http://localhost:5173"], # 本番環境ではCloudFrontのURLを指定する
+>>>>>>> 716d2e871f79b432a0717ad1d1cdd1052d0f896d
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -179,16 +188,69 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
 
     return c_tag_array, num_tags
 
+<<<<<<< HEAD
 @app.get("/")
 def health_check():
     return {"status": "ok"}
+=======
+
+async def rerun_gemini_on_all_tips(db: Session) -> int:
+    """既存DBデータに対してGemini APIを再実行し、要約内容を更新する"""
+    tips = db.query(models.TipsDatabase).all()
+    if not tips:
+        print("[Gemini-Retry-Response] 更新対象のデータがありません")
+        return 0
+
+    recipes = []
+    ids = []
+    for tip in tips:
+        ids.append(tip.id)
+        recipes.append({
+            "recipeTitle": tip.tipTitle,
+            "recipeDescription": tip.tipExplanation,
+            "recipeMaterial": tip.mainTags,
+            "categoryName": tip.subTags[0] if tip.subTags else "",
+            # source/url は再生成しないため空にしておく
+            "recipeUrl": "",
+            "recipePublishday": "",
+        })
+
+    summaries = await summarize_with_gemini(recipes)
+
+    updated = 0
+    for tip_id, summary in zip(ids, summaries):
+        tip = db.query(models.TipsDatabase).filter(models.TipsDatabase.id == tip_id).first()
+        if not tip:
+            continue
+        tip.tipTitle = summary.get("tipTitle", tip.tipTitle)
+        tip.tipExplanation = summary.get("tipExplanation", tip.tipExplanation)
+        tip.mainTags = summary.get("mainTags", tip.mainTags)
+        tip.subTags = summary.get("subTags", tip.subTags)
+        updated += 1
+
+    db.commit()
+    print(f"[Gemini-Retry-Response] 更新完了: {updated}件")
+    return updated
+
+>>>>>>> 716d2e871f79b432a0717ad1d1cdd1052d0f896d
 
 #検索表示用のデータ読み込み
 @app.get("/tips", response_model=List[TipDisplay])
-def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): # クエリパラメータ 'tag' を定義
+async def get_tips(
+    tag: Optional[str] = Query(None),
+    sort: Optional[str] = Query(None),
+    order: Optional[str] = Query("desc"),
+    db: Session = Depends(get_db),
+):  # クエリパラメータ 'tag' を定義
     query = db.query(models.TipsDatabase)
 
     normalized_tag = (tag or "").replace("\u3000", " ").strip()
+
+    # 特殊コマンド: Geminiへの再送信と内容更新
+    if normalized_tag == "Gemini-Retry-Response":
+        print("[Gemini-Retry-Response] Geminiへの再送信を実行します")
+        await rerun_gemini_on_all_tips(db)
+        normalized_tag = ""
 
     # 開発用コマンド: 検索欄に "develop show-all-data" と入力するとDB全件をコンソール出力
     if normalized_tag.lower() == "develop show-all-data":
@@ -227,9 +289,22 @@ def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): #
             ).bindparams(p=f'%{normalized_tag}%')
         )
 
+    # 2. ソート（人気順）
+    if sort == "likes":
+        if order == "asc":
+            query = query.order_by(models.TipsDatabase.tipLikes.asc())
+        else:
+            query = query.order_by(models.TipsDatabase.tipLikes.desc())
+
     filtered_data = query.all()
 
-    # 2. 絞り込み後のリストに対して表示用計算を行う
+    # ソート（人気順）で取得した際の並び順をログ出力
+    if sort == "likes":
+        order_label = "ASC" if order == "asc" else "DESC"
+        ordered = [(item.id, item.tipLikes) for item in filtered_data]
+        print(f"[sort=likes order={order_label}] {ordered}")
+
+    # 3. 絞り込み後のリストに対して表示用計算を行う
     display_tips = []
     for item in filtered_data:
         tip_rotate = (random.random() - 0.5) * 10
@@ -251,6 +326,13 @@ def get_tips(tag: Optional[str] = Query(None), db: Session = Depends(get_db)): #
     if len(display_tips) <= 0:
         print("[GA] skipped: n <= 0 (no tips to arrange)")
         return display_tips
+
+    # C側ライブラリの内部配列サイズには上限があるため、念の為上限以内に切り詰める
+    # (libGA.so で MAX_TIPS 100 程度が固定されている想定)
+    MAX_TIPS = 100
+    if len(display_tips) > MAX_TIPS:
+        print(f"[GA] trimmed display_tips from {len(display_tips)} to {MAX_TIPS} to avoid C buffer overflow")
+        display_tips = display_tips[:MAX_TIPS]
 
     c_array, num_tips = convert_tips_to_c_array(display_tips)
     c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
@@ -303,10 +385,19 @@ def update_tip_likes(tip_id: str, update_data: LikeUpdate, db: Session = Depends
     if not tip:
         raise HTTPException(status_code=404, detail="Tip not found")
 
-    # データを更新
-    tip.tipLikes = update_data.tipLikes
+    # 受信した値をログに出しておく（保存されない問題の調査用）
+    logger.info(f"[likes] update request: tip_id={tip_id} tipLikes={update_data.tipLikes}")
+
+    # データを更新（文字列でも受け入れる）
+    try:
+        tip.tipLikes = int(update_data.tipLikes)
+    except Exception:
+        tip.tipLikes = update_data.tipLikes  # そのまま入れる（整数以外でも保持される）
+
     db.commit()
     db.refresh(tip)
+
+    logger.info(f"[likes] updated DB: tip_id={tip_id} tipLikes={tip.tipLikes}")
 
     return {
         "id": tip.id,
@@ -327,7 +418,12 @@ def update_tips_batch_likes(batch: LikesBatchUpdate, db: Session = Depends(get_d
     for tip_id, likes_count in batch.updates.items():
         tip = db.query(models.TipsDatabase).filter(models.TipsDatabase.id == tip_id).first()
         if tip:
-            tip.tipLikes = likes_count
+            logger.info(f"[batch-likes] update request: tip_id={tip_id} tipLikes={likes_count}")
+            try:
+                tip.tipLikes = int(likes_count)
+            except Exception:
+                tip.tipLikes = likes_count
+            logger.info(f"[batch-likes] updated DB: tip_id={tip_id} tipLikes={tip.tipLikes}")
 
     db.commit()
     return {"updated": list(batch.updates.keys())}
@@ -357,6 +453,7 @@ async def fetch_category_list() -> dict:
         res = await client.get(CATEGORY_LIST_URL, params=params)
     if res.status_code != 200:
         raise Exception(f"カテゴリ一覧の取得に失敗: {res.status_code}")
+    print("[楽天API] カテゴリ一覧取得完了")
     return res.json()
 
 
@@ -388,6 +485,7 @@ async def fetch_category_ranking(category_id: str) -> dict:
         res = await client.get(CATEGORY_RANKING_URL, params=params)
     if res.status_code != 200:
         raise Exception(f"ランキング取得失敗: {res.status_code}")
+    print(f"[楽天API] カテゴリランキング取得完了: {category_id}")
     return res.json()
 
 
@@ -422,7 +520,7 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
     prompt = (
         "以下の楽天レシピのデータを、料理Tipsカードとして表示するために加工してください。\n"
         "料理の材料毎に、材料の調理のコツや方法について以下のJSON形式で出力してください。\n"
-        "JSONの配列のみを出力してください。\n"
+        f"このリストには {len(recipes)} 件のレシピがあります。必ず {len(recipes)} 件の要素を持つJSON配列（[...]）のみを出力してください。\n"
         "出力形式:\n"
         '[\n  {\n    "tipTitle": "短く簡潔なタイトル",\n'
         '    "tipExplanation": "簡潔な料理のコツ（40文字以内）",\n'
@@ -438,15 +536,37 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             res = await client.post(GEMINI_API_URL, params={"key": GEMINI_API_KEY}, json=payload)
         if res.status_code != 200:
             print(f"Gemini APIエラー: {res.status_code} {res.text}")
             return fallback_transform(recipes)
-        text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+        try:
+            response_json = res.json()
+            print(f"[Gemini API] レスポンス取得完了")
+            print(f"[Gemini API] レスポンス: {json.dumps(response_json, ensure_ascii=False)}")
+        except Exception as e:
+            print(f"[Gemini API] レスポンスJSON変換失敗: {e} / raw: {res.text}")
+            return fallback_transform(recipes)
+
+        text = response_json["candidates"][0]["content"]["parts"][0]["text"]
         summaries = json.loads(text)
+
+        # デバッグ: recipes[i] と summaries[i] の対応をログ出力（ずれがないか確認する）
+        max_check = min(len(recipes), len(summaries))
+        print(f"[Gemini対応確認] recipes={len(recipes)} summaries={len(summaries)}")
+        for i in range(max_check):
+            print(
+                f"[Gemini対応確認] idx={i} recipeTitle={recipes[i].get('recipeTitle')!r} "
+                f"=> summaryTitle={summaries[i].get('tipTitle')!r}"
+            )
+        if len(recipes) != len(summaries):
+            print(f"[Gemini対応確認] 件数不一致: recipes={len(recipes)} summaries={len(summaries)}")
+
     except Exception as e:
-        print(f"Gemini API失敗: {e}")
+        print(f"Gemini API失敗: {type(e).__name__} {repr(e)}")
+        print(traceback.format_exc())
         return fallback_transform(recipes)
 
     tips = []

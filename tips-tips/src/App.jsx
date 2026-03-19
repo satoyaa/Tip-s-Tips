@@ -4,6 +4,7 @@ import { SquarePen } from "lucide-react";
 import './App.css'
 import TipsBoard from './Components/TipsBoard'
 import PostTip from './Components/PostTip';
+import PopularTipsGrid from './Components/PopularTipsGrid';
 
 function App() {
   const [inputWord, setInputWord] = useState("");
@@ -12,28 +13,14 @@ function App() {
   const [isPop, setIsPop] = useState(false);
   const [tips, setTips] = useState([]);
 
-
   useEffect(() => {
+    if (!confirmedWord) {
+      return;
+    }
+
     const fetchTips = async () => {
-      //評価値更新用処理
-      const updates = {};
-      tips.forEach(tip => {
-        updates[tip.id] = tip.tipLikes;
-      });
-
-      //await fetch("http://localhost:8000/tips/batch-likes", {
-      await fetch(`${import.meta.env.VITE_API_URL}/tips/batch-likes`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ updates }),
-      });
-
-      //検索用処理
-      //const url = new URL("http://localhost:8000/tips");
       const url = new URL(`${import.meta.env.VITE_API_URL}/tips`);
-      if (confirmedWord) {
-        url.searchParams.append("tag", confirmedWord);
-      }
+      url.searchParams.append("tag", confirmedWord);
 
       try {
         const response = await fetch(url);
@@ -50,7 +37,7 @@ function App() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [confirmedWord]); //入力が確定されるたびに実行
+  }, [confirmedWord]); // 入力が確定されるたびに実行
 
   const onInputKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -93,8 +80,17 @@ function App() {
       </button>
       
       <PostTip isPop={isPop} setIsPop={setIsPop}></PostTip>
-      
-      <TipsBoard isDisplay={isDisplay} tips={tips} setTips={setTips}></TipsBoard>
+
+      {isDisplay ? (
+        <TipsBoard
+          isDisplay={true}
+          tips={tips}
+          setTips={setTips}
+          layout="free"
+        />
+      ) : (
+        <PopularTipsGrid />
+      )}
     </>
   )
 }
