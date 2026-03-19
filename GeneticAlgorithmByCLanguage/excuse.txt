@@ -21,3 +21,6 @@ gcc ga_shift_with_height.c fitness_with_height.c initialize.c selection.c crosso
 
 GA構築用（パラメータ調整）
 gcc parameter.c fitness.c initialize.c selection.c crossover.c mutation.c collision.c save.c
+
+GA構築用（パラメータ調整）シフト突然変異導入
+gcc parameter_shift.c fitness_with_height.c initialize.c selection.c crossover.c mutation.c mutation_shift.c collision.c save.c
