@@ -13,7 +13,7 @@ double best;
 int best_index = 0;
 int maxWidth = 1280;
 int tipWidth = 257;
-int tipHeight = 186;
+int tipHeight = 257;
 double crossover_rate = 0.1;
 double mutation_rate = 0.5;
 double mutation_shift_rate = 0.3;
