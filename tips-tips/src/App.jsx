@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { SquarePen } from "lucide-react";
 
 import './App.css'
-import SortControls from './Components/SortControls';
 import TipsBoard from './Components/TipsBoard'
 import PostTip from './Components/PostTip';
 
@@ -12,19 +11,28 @@ function App() {
   const [isDisplay, setIsDisplay] = useState(false);
   const [isPop, setIsPop] = useState(false);
   const [tips, setTips] = useState([]);
-  const [sortBy, setSortBy] = useState("");
 
 
   useEffect(() => {
     const fetchTips = async () => {
-      // 検索／ソートのパラメータを組み立て
+      //評価値更新用処理
+      const updates = {};
+      tips.forEach(tip => {
+        updates[tip.id] = tip.tipLikes;
+      });
+
+      //await fetch("http://localhost:8000/tips/batch-likes", {
+      await fetch(`${import.meta.env.VITE_API_URL}/tips/batch-likes`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates }),
+      });
+
+      //検索用処理
+      //const url = new URL("http://localhost:8000/tips");
       const url = new URL(`${import.meta.env.VITE_API_URL}/tips`);
       if (confirmedWord) {
         url.searchParams.append("tag", confirmedWord);
-      }
-      if (sortBy === "likes") {
-        url.searchParams.append("sort", "likes");
-        url.searchParams.append("order", "desc");
       }
 
       try {
@@ -42,7 +50,7 @@ function App() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [confirmedWord, sortBy]); // 入力・ソート条件が変わるたびに実行
+  }, [confirmedWord]); //入力が確定されるたびに実行
 
   const onInputKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -59,10 +67,7 @@ function App() {
     setConfirmedWord("");
     setTips([]);
     setIsDisplay(false);
-    setSortBy("");
   };
-
-  const layout = sortBy === "likes" ? "grid" : "free";
 
   return (
     <>
@@ -88,16 +93,7 @@ function App() {
       </button>
       
       <PostTip isPop={isPop} setIsPop={setIsPop}></PostTip>
-
-      {/* 人気順ソート */}
-      <SortControls sortBy={sortBy} setSortBy={setSortBy} />
-
-      <TipsBoard
-        isDisplay={isDisplay}
-        tips={tips}
-        setTips={setTips}
-        layout={layout}
-      ></TipsBoard>
+      <TipsBoard isDisplay={isDisplay} tips={tips} setTips={setTips}></TipsBoard>
     </>
   )
 }
