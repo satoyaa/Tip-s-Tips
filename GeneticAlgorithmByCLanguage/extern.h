@@ -54,5 +54,6 @@ extern int tipHeight;
 extern double crossover_rate;
 extern double mutation_rate;
 extern double mutation_shift_rate;
+extern double mutation_shift_rate;
 
 #endif
