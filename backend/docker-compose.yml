@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # コンテナ内ではlocalhostではなくdbサービスを指す
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
