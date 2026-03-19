@@ -26,6 +26,7 @@ const Tip = ({data, setTips}) => {
 
     return(
         <div className="tip" style={{top:`${data.tipTop}px`, left:`${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`}}>
+            {/*<div className="tip" style={{top:`${data.tipTop}px`, left:`${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`, background: `#{${data.color}}`}}>*/}
             <a href={data.tipDetails} className="tipDetails" aria-label="詳細を見る" />
             <h2 className="tipTitle">{data.tipTitle}</h2>
             <p className="tipText">{data.tipExplanation}</p>
