@@ -59,10 +59,14 @@ app = FastAPI(lifespan=lifespan)
 # CORS設定（Reactからのアクセス許可）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tips-tips.jp"], # 本番環境ではCloudFrontのURLを指定する
+    allow_origins=["https://tips-tips.jp",
+                   "http://localhost:5173",], # 本番環境ではCloudFrontのURLを指定する
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 # --- データ構造の定義 ---
 
@@ -174,6 +178,10 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
         c_tag_array[i].value = tag.encode('utf-8')
 
     return c_tag_array, num_tags
+
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
 
 #検索表示用のデータ読み込み
 @app.get("/tips", response_model=List[TipDisplay])
@@ -535,3 +543,4 @@ async def trigger_collection_keyword(keyword: str):
         fetch_category_ranking, summarize_with_gemini,
     )
     return {"message": f"'{keyword}' → {count}件保存"}
+
