@@ -15,8 +15,8 @@ int maxWidth = 1280;
 int tipWidth = 257;
 int tipHeight = 257;
 double crossover_rate = 0.1;
-double mutation_rate = 0.5;
-double mutation_shift_rate = 0.2;
+double mutation_rate = 0.2;
+double mutation_shift_rate = 1.0;
 int max_tips;
 
 char Taglist[100][64] = {"Tag0", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"};
