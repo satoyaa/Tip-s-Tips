@@ -3,7 +3,7 @@ import { memo } from 'react';
 
 
 const TipsBoard = memo(({ isDisplay, tips = [], setTips, layout }) => {
-    const boardHeight = tips?.[0]?.tipsBoardHeight ?? 0;
+    const boardHeight = tips?.[0]?.tipsBoardHeight ?? 500;
     console.log(boardHeight);
 
     return (

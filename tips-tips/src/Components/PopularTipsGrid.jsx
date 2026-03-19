@@ -33,24 +33,35 @@ export default function PopularTipsGrid() {
   }, []);
 
   return (
-    <Swiper
-      modules={[Navigation, Pagination]}
-      navigation
-      pagination={{ clickable: true }}
-      spaceBetween={30}
-      slidesPerView={4}
-    >
-      {tips.map((data) => {
-        return (
-          <SwiperSlide key={data.id}>
-            <Tip
-              data={data}
-              setTips={setTips}
-              layout={"grid"}
-            />
-          </SwiperSlide>
-        )
-      })}
-    </Swiper>
+    <>
+    <h2>あなたへのおすすめ</h2>
+      <div className="swiperContainer">
+        <Swiper
+          modules={[Navigation, Pagination]}
+          navigation
+          pagination={{ clickable: true }}
+          centeredSlides={true}
+          spaceBetween={30}
+          slidesPerView={"auto"}
+          breakpoints={{
+            600: {slidesPerView:2 },
+            900: { slidesPerView: 3 },
+            1028: { slidesPerView: 4 }
+          }}
+        >
+          {tips.map((data) => {
+            return (
+              <SwiperSlide key={data.id}>
+                <Tip
+                  data={data}
+                  setTips={setTips}
+                  layout={"grid"}
+                />
+              </SwiperSlide>
+            )
+          })}
+        </Swiper>
+      </div>
+    </>
   );
 }

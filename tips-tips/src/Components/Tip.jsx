@@ -60,7 +60,7 @@ const Tip = ({ data, setTips, layout }) => {
       className="tip"
       style={
         layout === "grid"
-          ? { position: "static"}
+          ? { position: "relative"}
           : { position: "absolute", top: `${data.tipTop}px`, left: `${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`, backgroundColor: `${data.tipColor}` }
       }
     >
