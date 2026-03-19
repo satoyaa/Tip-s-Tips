@@ -22,12 +22,18 @@ def save_tips_to_db(tips: list[dict]):
         for tip in tips:
             title = tip.get("tipTitle", "")
 
-            # 重複チェック: 同じtipTitleが既に存在する場合はスキップ
+            # 重複チェック: 同じtipTitleが既に存在する場合は上書き
             existing = db.query(models.TipsDatabase).filter(
                 models.TipsDatabase.tipTitle == title
             ).first()
             if existing:
-                print(f"[データ収集] 重複スキップ: {title}")
+                existing.tipExplanation = tip.get("tipExplanation", "")
+                existing.mainTags = tip.get("mainTags", [])
+                existing.subTags = tip.get("subTags", [])
+                existing.source = tip.get("source", [])
+                existing.upLoadDate = tip.get("upLoadDate", datetime.now().strftime("%Y/%m/%d"))
+                saved_count += 1
+                print(f"[データ収集] 重複上書き: {title}")
                 continue
 
             new_tip = models.TipsDatabase(
@@ -45,7 +51,7 @@ def save_tips_to_db(tips: list[dict]):
             saved_count += 1
 
         db.commit()
-        print(f"[データ収集] {saved_count}件保存（{len(tips) - saved_count}件重複スキップ）")
+        print(f"[データ収集] {saved_count}件保存（{len(tips) - saved_count}件重複）")
         return saved_count
     except Exception as e:
         db.rollback()
@@ -110,21 +116,50 @@ async def collect_all_recipes(
     fetch_category_ranking,
     summarize_with_gemini,
 ):
-    """全キーワードについてデータ収集を実行"""
+    """全キーワードについてデータ収集を実行（Geminiは1回のみ呼ぶ）"""
     print("[データ収集] 開始...")
-    total = 0
+
+    try:
+        category_data = await fetch_category_list()
+    except Exception as e:
+        print(f"[データ収集] カテゴリ一覧取得失敗: {e}")
+        return 0
+
+    all_recipes = []
     for keyword in keywords:
-        count = await collect_recipes_for_keyword(
-            keyword,
-            fetch_category_list,
-            search_categories,
-            fetch_category_ranking,
-            summarize_with_gemini,
-        )
-        total += count
-        await asyncio.sleep(1)  # API負荷軽減
-    print(f"[データ収集] 完了 — 合計 {total}件保存")
-    return total
+        matched_categories = search_categories(category_data, keyword)
+        if not matched_categories:
+            print(f"[データ収集] '{keyword}' に一致するカテゴリなし")
+            continue
+
+        target_categories = matched_categories[:5]
+        for cat in target_categories:
+            try:
+                ranking_data = await fetch_category_ranking(cat["categoryId"])
+                for recipe in ranking_data.get("result", []):
+                    all_recipes.append({
+                        "recipeId": recipe.get("recipeId"),
+                        "recipeTitle": recipe.get("recipeTitle"),
+                        "recipeDescription": recipe.get("recipeDescription"),
+                        "recipeMaterial": recipe.get("recipeMaterial"),
+                        "recipeUrl": recipe.get("recipeUrl"),
+                        "recipePublishday": recipe.get("recipePublishday"),
+                        "categoryName": cat["categoryName"],
+                        "keyword": keyword,
+                    })
+            except Exception as e:
+                print(f"[データ収集] {keyword}/{cat['categoryName']} 取得エラー: {e}")
+
+        await asyncio.sleep(0.5)  # API負荷軽減
+
+    if not all_recipes:
+        print("[データ収集] レシピが取得できませんでした")
+        return 0
+
+    tips = await summarize_with_gemini(all_recipes)
+    saved = save_tips_to_db(tips)
+    print(f"[データ収集] 完了 — 合計 {saved}件保存")
+    return saved
 
 
 async def periodic_collection(

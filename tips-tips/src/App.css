@@ -221,3 +221,22 @@
   line-height: 1.5;
   color: #2c2c2c;
 }
+
+/* layout mode */
+.tipsBoard.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(200px, 1fr));
+  gap: 1.2rem;
+  position: static;
+  height: auto;
+  padding: 1.2rem;
+}
+
+.tipsBoard.grid .tip {
+  position: relative;
+  transform: none;
+}
+
+.tipsBoard.free.isDisplay {
+  display: block;
+}

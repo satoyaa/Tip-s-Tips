@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 
 const Tip = ({data, setTips}) => {
     const [tipLike, setTipLike] = useState(data.tipLikes);
@@ -6,8 +6,9 @@ const Tip = ({data, setTips}) => {
 
     // propsのtipLikesが変わったらローカル状態に反映
     useEffect(() => {
-        setTipLike(data.tipLikes);
-    }, [data.tipLikes]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTipLike(data.tipLikes);
+  }, [data.tipLikes]);
 
     const changeLikes = () => {
         const nextLike = isClicked ? tipLike - 1 : tipLike + 1;
