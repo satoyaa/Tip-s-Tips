@@ -6,6 +6,7 @@ from pydantic import BaseModel, HttpUrl
 from typing import Dict, List, Optional
 from datetime import datetime
 import asyncio
+import logging
 import random
 import uuid
 import json
@@ -22,6 +23,9 @@ import models
 from database import engine, get_db, SessionLocal
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from collector import collect_all_recipes, collect_recipes_for_keyword, periodic_collection
 
@@ -367,10 +371,19 @@ def update_tip_likes(tip_id: str, update_data: LikeUpdate, db: Session = Depends
     if not tip:
         raise HTTPException(status_code=404, detail="Tip not found")
 
-    # データを更新
-    tip.tipLikes = update_data.tipLikes
+    # 受信した値をログに出しておく（保存されない問題の調査用）
+    logger.info(f"[likes] update request: tip_id={tip_id} tipLikes={update_data.tipLikes}")
+
+    # データを更新（文字列でも受け入れる）
+    try:
+        tip.tipLikes = int(update_data.tipLikes)
+    except Exception:
+        tip.tipLikes = update_data.tipLikes  # そのまま入れる（整数以外でも保持される）
+
     db.commit()
     db.refresh(tip)
+
+    logger.info(f"[likes] updated DB: tip_id={tip_id} tipLikes={tip.tipLikes}")
 
     return {
         "id": tip.id,
@@ -391,7 +404,12 @@ def update_tips_batch_likes(batch: LikesBatchUpdate, db: Session = Depends(get_d
     for tip_id, likes_count in batch.updates.items():
         tip = db.query(models.TipsDatabase).filter(models.TipsDatabase.id == tip_id).first()
         if tip:
-            tip.tipLikes = likes_count
+            logger.info(f"[batch-likes] update request: tip_id={tip_id} tipLikes={likes_count}")
+            try:
+                tip.tipLikes = int(likes_count)
+            except Exception:
+                tip.tipLikes = likes_count
+            logger.info(f"[batch-likes] updated DB: tip_id={tip_id} tipLikes={tip.tipLikes}")
 
     db.commit()
     return {"updated": list(batch.updates.keys())}
