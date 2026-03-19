@@ -76,7 +76,6 @@
   position: relative;
   display: none;
   background-color: rgb(255, 207, 117);
-  height: 300vh;
 }
 
 .tipsBoard.isDisplay{
@@ -90,7 +89,7 @@
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
   padding: 1.4rem 1.4rem 1.2rem;
   max-width: 230px;
-  min-width: 120px;
+  min-width: 230px;
   width: 212px;
   height: 212px;
   text-align: left;

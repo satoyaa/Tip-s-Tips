@@ -64,13 +64,9 @@ app = FastAPI(lifespan=lifespan)
 # CORS設定（Reactからのアクセス許可）
 app.add_middleware(
     CORSMiddleware,
-<<<<<<< HEAD
     allow_origins=["https://tips-tips.jp",
                    "http://localhost:5173",], # 本番環境ではCloudFrontのURLを指定する
     allow_credentials=True,
-=======
-    allow_origins=["http://localhost:5173"], # 本番環境ではCloudFrontのURLを指定する
->>>>>>> 716d2e871f79b432a0717ad1d1cdd1052d0f896d
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -105,6 +101,7 @@ class TipDisplay(BaseModel):
     tipTop: float
     tipLeft : float
     tipRotate : float
+    tipsBoardHeight: int
     source: List[str]
     tipLikes: int
     tipDislikes: int
@@ -188,11 +185,9 @@ def convert_tags_to_c_array(tag_list, max_byte_length=64):
 
     return c_tag_array, num_tags
 
-<<<<<<< HEAD
 @app.get("/")
 def health_check():
     return {"status": "ok"}
-=======
 
 async def rerun_gemini_on_all_tips(db: Session) -> int:
     """既存DBデータに対してGemini APIを再実行し、要約内容を更新する"""
@@ -232,7 +227,6 @@ async def rerun_gemini_on_all_tips(db: Session) -> int:
     print(f"[Gemini-Retry-Response] 更新完了: {updated}件")
     return updated
 
->>>>>>> 716d2e871f79b432a0717ad1d1cdd1052d0f896d
 
 #検索表示用のデータ読み込み
 @app.get("/tips", response_model=List[TipDisplay])
@@ -316,6 +310,7 @@ async def get_tips(
             tipTop=0.0,
             tipLeft=0.0,
             tipRotate=tip_rotate,
+            tipsBoardHeight=0,
             subTags=item.subTags,
             source=item.source,
             tipLikes=item.tipLikes,
@@ -337,9 +332,13 @@ async def get_tips(
     c_array, num_tips = convert_tips_to_c_array(display_tips)
     c_tag_array, num_tags = convert_tags_to_c_array(tag_list)
     lib.ga_main(c_array, num_tips, c_tag_array, num_tags)
+    max_height = 0
     for i in range(num_tips):
         display_tips[i].tipLeft = c_array[i].x
         display_tips[i].tipTop = c_array[i].y
+        if(max_height<c_array[i].y):
+            max_height = c_array[i].y
+    display_tips[0].tipsBoardHeight = max_height+280
     return display_tips
 
 #ユーザ投稿の新しいデータの追加
