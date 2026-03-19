@@ -68,7 +68,7 @@ function App() {
        value={inputWord}
        onChange={ (e) => setInputWord(e.target.value)}
        onKeyDown={onInputKeyDown}
-       placeholder='幸せを探す'
+       placeholder='暮らしを豊かにする！例：肉，魚，etc...'
        className='customInput'
       />
       <button className='postOpenButton' onClick={()=>setIsPop(true)}>

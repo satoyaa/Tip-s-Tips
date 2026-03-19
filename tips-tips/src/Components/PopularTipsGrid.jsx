@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import TipsBoard from "./TipsBoard";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import Tip from './Tip'
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 
 export default function PopularTipsGrid() {
   const [tips, setTips] = useState([]);
@@ -25,11 +33,24 @@ export default function PopularTipsGrid() {
   }, []);
 
   return (
-    <TipsBoard
-      isDisplay={true}
-      tips={tips}
-      setTips={setTips}
-      layout="grid"
-    />
+    <Swiper
+      modules={[Navigation, Pagination]}
+      navigation
+      pagination={{ clickable: true }}
+      spaceBetween={30}
+      slidesPerView={4}
+    >
+      {tips.map((data) => {
+        return (
+          <SwiperSlide key={data.id}>
+            <Tip
+              data={data}
+              setTips={setTips}
+              layout={"grid"}
+            />
+          </SwiperSlide>
+        )
+      })}
+    </Swiper>
   );
 }

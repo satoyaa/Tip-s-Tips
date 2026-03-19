@@ -60,8 +60,8 @@ const Tip = ({ data, setTips, layout }) => {
       className="tip"
       style={
         layout === "grid"
-          ? {}
-          : { top: `${data.tipTop}px`, left: `${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)` }
+          ? { position: "static"}
+          : { position: "absolute", top: `${data.tipTop}px`, left: `${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`, backgroundColor: `${data.tipColor}` }
       }
     >
             <a href={data.tipDetails} className="tipDetails" aria-label="詳細を見る" />

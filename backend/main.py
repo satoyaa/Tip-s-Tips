@@ -102,6 +102,7 @@ class TipDisplay(BaseModel):
     tipLeft : float
     tipRotate : float
     tipsBoardHeight: int
+    tipColor: str = "#f9f9f9"
     source: List[str]
     tipLikes: int
     tipDislikes: int
@@ -126,6 +127,26 @@ class DataPoint(ctypes.Structure):
 
 #タグリスト（食材系）
 tag_list = ["肉", "魚", "野菜", "麺", "鍋", "焼き鳥", "カレー", "パン", "卵"]
+
+# subTags（調理方法）に対応するカラーコード（検索結果表示で使用）
+# sub_tags の先頭要素を見て色を決める。タグリスト(tag_list)ではない点に注意。
+SUBTAG_COLOR_MAP = {
+    "煮る(茹でる)": "#FFB3BA",   # パステルレッド・ピンク系
+    "焼く": "#FFDFBA",          # パステルオレンジ系
+    "蒸す": "#FFFFBA",          # パステルイエロー系
+    "揚げる": "#BAFFC9",        # パステルグリーン系
+    "生": "#BAE1FF",            # パステルブルー系
+    "切る": "#E8B2FF",          # パステルパープル系
+    "混ぜる": "#FFD1DC",        # ライトピンク系
+    "盛り付ける": "#FDFD96",    # レモンイエロー系
+    "味付ける": "#AEC6CF",      # ライトブルーグレー系
+    "潰す": "#B3FFE0",          # ソフトミント系
+    "炙る": "#FFB8D1",          # ソフトローズ系
+    "研ぐ": "#C2E2FF",          # スカイブルー系
+    "剥く": "#F0C2E0",          # ソフトマゼンタ系
+    "調理済み(レトルト)": "#FFE5CC", # アプリコット系
+    "注ぐ": "#D0F5A9",          # ライトライム系
+}
 #sub_tags = ["煮る", "焼く", "蒸す", "揚げる", "生", "切る", "混ぜる", "盛り付ける"]
 sub_tags = ["煮る(茹でる)", "焼く", "蒸す", "揚げる", "生", "切る", "混ぜる", "盛り付ける","味付ける","潰す","炙る","研ぐ","剥く","調理済み(レトルト)","注ぐ"] 
 
@@ -140,6 +161,20 @@ lib.ga_main.argtypes = [
     ctypes.c_int,
 ]
 """
+
+def get_color_for_tag(tag: Optional[str]) -> str:
+    """subTags の先頭要素を sub_tags リストと照合し、カラーコードを返す。
+
+    sub_tags に存在しない要素であればデフォルトカラー（#f9f9f9）を返す。
+    """
+    
+    #subTagsの先頭要素とtagを出力
+    print(f"[get_color_for_tag] subTags先頭要素: {tag}")
+    
+    if not tag:
+        return "#f9f9f9"
+    return SUBTAG_COLOR_MAP.get(tag, "#f9f9f9")
+
 
 #C言語向け入力への変換用の関数
 def convert_tips_to_c_array(display_tips):
@@ -311,6 +346,7 @@ async def get_tips(
             tipLeft=0.0,
             tipRotate=tip_rotate,
             tipsBoardHeight=0,
+            tipColor=get_color_for_tag(item.subTags[0] if item.subTags else None),
             subTags=item.subTags,
             source=item.source,
             tipLikes=item.tipLikes,
