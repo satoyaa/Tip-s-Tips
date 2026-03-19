@@ -1,8 +1,8 @@
 #ifndef EXTERN_H
 #define EXTERN_H
 
-#define MAX_ITERATION 1000
-#define POPULATION 100
+#define MAX_ITERATION 10
+#define POPULATION 10
 #define M_PI 3.14159265358979323846
 #define LOOPS 30
 #define MAX_TIPS 100
