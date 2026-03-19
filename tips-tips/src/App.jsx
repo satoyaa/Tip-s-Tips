@@ -93,6 +93,7 @@ function App() {
       </button>
       
       <PostTip isPop={isPop} setIsPop={setIsPop}></PostTip>
+      
       <TipsBoard isDisplay={isDisplay} tips={tips} setTips={setTips}></TipsBoard>
     </>
   )
