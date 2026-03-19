@@ -64,7 +64,7 @@ app = FastAPI(lifespan=lifespan)
 # CORS設定（Reactからのアクセス許可）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tips-tips.jp"], # 本番環境ではCloudFrontのURLを指定する
+    allow_origins=["http://localhost:5173"], # 本番環境ではCloudFrontのURLを指定する
     allow_methods=["*"],
     allow_headers=["*"],
 )
