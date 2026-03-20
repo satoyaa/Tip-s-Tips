@@ -146,9 +146,10 @@ SUBTAG_COLOR_MAP = {
     "剥く": "#F0C2E0",          # ソフトマゼンタ系
     "調理済み(レトルト)": "#FFE5CC", # アプリコット系
     "注ぐ": "#D0F5A9",          # ライトライム系
+    "その他": "#FF0000",        # 引っかからなかったものは赤表示で分かりやすくする
 }
 #sub_tags = ["煮る", "焼く", "蒸す", "揚げる", "生", "切る", "混ぜる", "盛り付ける"]
-sub_tags = ["煮る(茹でる)", "焼く", "蒸す", "揚げる", "生", "切る", "混ぜる", "盛り付ける","味付ける","潰す","炙る","研ぐ","剥く","調理済み(レトルト)","注ぐ"] 
+sub_tags = ["煮る(茹でる)", "焼く", "蒸す", "揚げる", "生", "切る", "混ぜる", "盛り付ける","味付ける","潰す","炙る","研ぐ","剥く","調理済み(レトルト)","注ぐ","その他"] 
 
 #lib = ctypes.CDLL('./libGA2.dll') #Windows向け
 lib = ctypes.CDLL('./libGA.so') #Linux向け
@@ -531,7 +532,9 @@ def fallback_transform(recipes: list[dict]) -> list[dict]:
         publish = recipe.get("recipePublishday", "")
         date_str = publish.split(" ")[0] if publish else ""
         tips.append({
-            "tipTitle": recipe.get("recipeTitle", ""),
+            # Geminiによる置き換えに失敗した場合は、楽天APIからのタイトルではなく "Error" を表示する
+            "tipTitle": "Error",
+            # "tipTitle": recipe.get("recipeTitle", ""),  # 以前は楽天APIからのタイトルをそのまま表示していました
             "tipExplanation": recipe.get("recipeDescription", ""),
             "mainTags": recipe.get("recipeMaterial", [])[:3],
             "subTags": [recipe.get("categoryName", "")],
@@ -554,8 +557,12 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
 
     prompt = (
         "以下の楽天レシピのデータを、料理Tipsカードとして表示するために加工してください。\n"
+        f"全部で {len(recipes)} 件のレシピがあります。\n"
         "料理の材料毎に、材料の調理のコツや方法について以下のJSON形式で出力してください。\n"
-        f"このリストには {len(recipes)} 件のレシピがあります。必ず {len(recipes)} 件の要素を持つJSON配列（[...]）のみを出力してください。\n"
+        "以下のタグ候補から選択して、mainTags と subTags を作成してください。\n"
+        f"mainTags の候補: {json.dumps(tag_list, ensure_ascii=False)}\n"
+        f"subTags の候補: {json.dumps(sub_tags, ensure_ascii=False)}\n"
+        "mainTags は候補から最大1つ、subTags は候補から最大3つ選んでください。候補外の物を用いるのは禁止です。\n"
         "出力形式:\n"
         '[\n  {\n    "tipTitle": "短く簡潔なタイトル",\n'
         '    "tipExplanation": "簡潔な料理のコツ（40文字以内）",\n'
@@ -609,8 +616,20 @@ async def summarize_with_gemini(recipes: list[dict]) -> list[dict]:
         summary = summaries[i] if i < len(summaries) else {}
         publish = recipe.get("recipePublishday", "")
         date_str = publish.split(" ")[0] if publish else ""
+
+        original_title = recipe.get("recipeTitle", "")
+        gemini_title = summary.get("tipTitle")
+
+        # Geminiによる置き換えに成功した場合は、置き換え前後のタイトルをログに出す
+        if gemini_title:
+            print(f"[Gemini] 置き換え前: {original_title!r} -> 置き換え後: {gemini_title!r}")
+            tip_title = gemini_title
+        else:
+            tip_title = "Error"  # Geminiで置き換えが失敗したときは楽天APIタイトルではなくエラー表示
+            # tip_title = original_title  # 以前は楽天APIからのタイトルを使っていました
+
         tips.append({
-            "tipTitle": summary.get("tipTitle", recipe.get("recipeTitle", "")),
+            "tipTitle": tip_title,
             "tipExplanation": summary.get("tipExplanation", recipe.get("recipeDescription", "")),
             "mainTags": summary.get("mainTags", recipe.get("recipeMaterial", [])[:3]),
             "subTags": summary.get("subTags", [recipe.get("categoryName", "")]),
@@ -629,7 +648,7 @@ def auto_tag_fallback(title: str, explanation: str) -> dict:
 
 
 async def auto_tag_with_gemini(title: str, explanation: str) -> dict:
-    """Gemini APIを使ってユーザ投稿にタグを付与する"""
+    """Gemini APIを使って　　ユーザ投稿に　　タグを付与する"""
     if not GEMINI_API_KEY:
         print("GEMINI_API_KEY 未設定 → キーワードマッチングを使用")
         return auto_tag_fallback(title, explanation)
