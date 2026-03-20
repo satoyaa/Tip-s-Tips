@@ -55,12 +55,17 @@ const Tip = ({ data, setTips, layout }) => {
           });
     }
 
+    const colors = ["#FFB3BA", "#FFDFBA", "#FFFFBA", "#BAFFC9", "#BAE1FF","#E8B2FF","#FFD1DC", "#FDFD96", "#AEC6CF", "#B3FFE0","#FFB8D1", "#C2E2FF", "#F0C2E0", "#FFE5CC", "#D0F5A9"];
+  // ランダムにインデックス（0〜3）を取得して色を決定
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    
+
     return(
         <div
-      className="tip"
+      className="tip sticky-note"
       style={
         layout === "grid"
-          ? { position: "relative"}
+          ? { position: "relative", backgroundColor: `${randomColor}` }
           : { position: "absolute", top: `${data.tipTop}px`, left: `${data.tipLeft}px`, transform: `rotate(${data.tipRotate}deg)`, backgroundColor: `${data.tipColor}` }
       }
     >

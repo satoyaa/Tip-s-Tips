@@ -23,7 +23,7 @@ export default function PopularTipsGrid() {
         const data = await res.json();
 
         // 先頭50件のみ表示
-        setTips(data.slice(0, 50));
+        setTips(data.slice(0, 20));
       } catch (e) {
         console.error("PopularTipsGrid fetch failed", e);
       }

@@ -92,8 +92,6 @@
 
 .tip {
   background-color: #f9f9f9;
-  border-radius: 18px;
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
   padding: 1.4rem 1.4rem 1.2rem;
   margin: 0 auto;
   max-width: 230px;
@@ -128,10 +126,16 @@
 }
 
 .tipTitle {
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   margin: 0;
   letter-spacing: -0.03em;
   color: #000;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tipText {
@@ -140,10 +144,10 @@
   line-height: 1.5;
   color: #2c2c2c;
 
-  /* 2行まで表示し、それ以上は省略して見やすくする */
+  /* 4行まで表示し、それ以上は省略して見やすくする */
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -246,4 +250,50 @@
 
 .tipsBoard.free.isDisplay {
   display: block;
+}
+
+.sticky-note {
+  /* ▼ カスタマイズ用の変数 ▼ */
+  --sticky-size: 230px;         /* 付箋全体のサイズ */
+  --border-width: 5px;         /* 線の太さ */
+  --fold-size: 30px;            /* 右上の折り返しのサイズ */
+  --sticky-color: #f3f3f3;      /* 付箋の黄色 */
+  --fold-color: #FFFFFF;        /* 折り返した裏面の色（白） */
+  --line-color: #000000;        /* 線の色（黒） */
+  
+  /* ★重要: 付箋の後ろにある背景色を指定してください（角を隠すため） */
+  --bg-color: rgb(255, 207, 117);          
+
+  /* ▼ メインの付箋スタイル ▼ */
+  width: var(--sticky-size);
+  height: var(--sticky-size);
+  background-color: var(--sticky-color);
+  border: var(--border-width) solid var(--line-color);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* ▼ 右上の折り返し部分（擬似要素で上に重ねる） ▼ */
+.sticky-note::after {
+  content: "";
+  position: absolute;
+  /* 親要素の線の分だけ外側に配置して角を覆い隠す */
+  top: calc(-1 * var(--border-width));
+  right: calc(-1 * var(--border-width));
+  width: var(--fold-size);
+  height: var(--fold-size);
+  
+  /* 折り返しの内側の折れ線（左と下） */
+  border-left: var(--border-width) solid var(--line-color);
+  border-bottom: var(--border-width) solid var(--line-color);
+  box-sizing: border-box;
+
+  /* グラデーションで「背景と同化」「斜めの黒線」「白い裏面」を塗り分ける */
+  background: linear-gradient(
+    to bottom left,
+    var(--bg-color) 43%,      /* 右上の角を背景色で塗りつぶして隠す */
+    var(--line-color) 43%,    /* 斜めの黒線（開始） */
+    var(--line-color) 57%,    /* 斜めの黒線（終了） */
+    var(--fold-color) 57%     /* 折り返しの白い部分 */
+  );
 }
