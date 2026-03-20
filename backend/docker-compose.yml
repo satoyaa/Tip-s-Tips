@@ -18,7 +18,8 @@ services:
       - .env
     environment:
       # コンテナ内ではlocalhostではなくdbサービスを指す
-      DATABASE_URL: postgresql://postgres:iwVLk8wPBRCnk8w@tips-tips-db.ctm0y60e4l8q.ap-northeast-1.rds.amazonaws.com:5432/postgres
+      #DATABASE_URL: postgresql://postgres:iwVLk8wPBRCnk8w@tips-tips-db.ctm0y60e4l8q.ap-northeast-1.rds.amazonaws.com:5432/postgres
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
     depends_on:
       - db
 
