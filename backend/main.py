@@ -485,8 +485,13 @@ async def fetch_category_list() -> dict:
         "applicationId": RAKUTEN_APP_ID,
         "accessKey": RAKUTEN_ACCESS_KEY,
     }
+    headers = {
+        "Origin": "https://tips-tips.jp",
+        "Referer": "https://tips-tips.jp",
+        "User-Agent": "Mozilla/5.0",
+    }
     async with httpx.AsyncClient() as client:
-        res = await client.get(CATEGORY_LIST_URL, params=params)
+        res = await client.get(CATEGORY_LIST_URL, params=params, headers=headers)
     if res.status_code != 200:
         raise Exception(f"カテゴリ一覧の取得に失敗: {res.status_code}")
     print("[楽天API] カテゴリ一覧取得完了")
@@ -517,8 +522,13 @@ async def fetch_category_ranking(category_id: str) -> dict:
         "accessKey": RAKUTEN_ACCESS_KEY,
         "categoryId": category_id,
     }
+    headers = {
+        "Origin": "https://tips-tips.jp",
+        "Referer": "https://tips-tips.jp",
+        "User-Agent": "Mozilla/5.0",
+    }
     async with httpx.AsyncClient() as client:
-        res = await client.get(CATEGORY_RANKING_URL, params=params)
+        res = await client.get(CATEGORY_RANKING_URL, params=params, headers=headers)
     if res.status_code != 200:
         raise Exception(f"ランキング取得失敗: {res.status_code}")
     print(f"[楽天API] カテゴリランキング取得完了: {category_id}")
